@@ -1,17 +1,6 @@
 #@ load("@ytt:data", "data")
 #@yaml/text-templated-strings
 ---
-#! oidc:
-#!     issuerType: "pinniped"
-#!     issuerURL: "https://dex.domain.com"
-#!     clientID: "tmc-auth"
-#!     clientSecret: "secretvalue"
----
-#! kubectl annotate packageinstalls tanzu-mission-control -n tmc-local ext.packaging.carvel.dev/ytt-paths-from-secret-name.2=tmc-overlay-override-dex
-#! kubectl patch -n tmc-local --type merge pkgi tanzu-mission-control --patch '{"spec": {"paused": true}}'
-#! kubectl patch -n tmc-local --type merge pkgi tanzu-mission-control --patch '{"spec": {"paused": false}}'
-#@ load("@ytt:data", "data")
----
 apiVersion: v1
 kind: Namespace
 metadata:
