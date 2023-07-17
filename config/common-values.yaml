@@ -2,19 +2,19 @@
 ---
 registry:
   tmc:
-    repo: harbor-00.platform.lab/tmc
+    repo: hmyharbor.mydomain.com/myproject
     version: 1.0.0
   standard:
-    repo: harbor-00.platform.lab/tkg/packages/standard/repo
+    repo: myharbor.mydomain.com/myproject
     version: v2.2.0
   openldap:
-    repo: harbor-00.platform.lab/tmc
+    repo: myharbor.mydomain.com/myproject
     version: 1.2.4
   busybox:
-    repo: harbor-00.platform.lab/tmc
+    repo: myharbor.mydomain.com/myproject
     version: latest
   dex:
-    repo: harbor-00.platform.lab/tmc
+    repo: myharbor.mydomain.com/myproject
     version: v2.35.3
 
 certmanager:
