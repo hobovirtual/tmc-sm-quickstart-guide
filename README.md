@@ -1,54 +1,138 @@
-# Tanzu Mission Control Self Managed: Quickstart installation guide
+# tanzu mission control - self managed - tkg
 
-## Introduction
-Tanzu Mission Control has been around for quite some time and the only option to benefit from the value that it brings to platform engineering team was to subscribe to the service via the VMware Cloud Service (aka SaaS). Recently we launch an alternative deployment method for customer that couldn't benefit from Tanzu Mission Control due to various constraints, you can read more about Tanzu Mission Control Self Managed release
+Configuration and instructions for installing tmc sm on tkg, a lot of this content was taking from various contributors.
+Please note this setup is using unsupported configuration
 
-[Beyond SaaS: Multi-cluster Kubernetes Management for Regulated Industries and Sovereign Clouds](https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement)
-
-We're providing this quickstart guide to help customers installing Tanzu Mission Control Self Managed 1.0 in their private environment. This doesn't replace in any form the installation guide that can be found here, but the intent is to go over the pre-requisites and installation steps required to get this service up and running.
-
-## Requirements
-Before starting the installation process, we have to provide some components 
-### Linux bootstrap machine
-In order to get started you will need access to a linux operating system (x86_64), the version 1.0.0 of the tmc-sm package is only supported on linux distribution. You will also need the carvel suite installed and of course network access to the environment (see this section)
-
-### Registry = Harbor
-Tanzu Mission Control Self Managed is delivered as a set of carvel packages, the containers required for the installation, needs to be hosted in a registry, in the current release only Harbor is supported.
+## prerequisite
+- tkc 1.23+
+- cert-manager 0.11+
+- kapp controller
+- carvel tools installed (ytt)
+- kubectl cli
+- (optional) external-dns for dynamic dns configuration
+- harbor project with the tmc-sm containers see the [Download and stage the installation images section](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html)
+- a registry (can be the same harbor project) with busybox and openldap container image
 
 
-### Kubernetes
-As previously mentioned, Tanzu Mission Control Self Managed is delivered as a set of carvel packages, we need to have access to a kubernetes cluster (version 1.23+), the cluster needs to have the following components available
+Please review TMC Self Managed requirements [here](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/prepare-cluster.html)
 
-- kapp-controller (installed on most Tanzu Kubernetes Clusters)
-- cert-manager
-- load balancer compatible with contour
+## installation steps
 
-### Identity Provider
-Tanzu Mission Control Self Managed needs access to an external identity provider, the provider needs to be OIDC compliant.
+### clone this repo
 
-### DNS
-We need to provide a DNS zone/sub zone
+### copy busybox - openldap - dex to your registry
+```
+# busybox
+-- imgpkg copy --tar images/busybox.tar --to-repo myharbor.mydomain.com/myproject/dex --include-non-distributable-layer
 
-- we can use external dns to manage these records
-- we can create a wildcard dns zone/sub zone
-- or we can manually pre-create these records
+# openldap
+-- imgpkg copy --tar images/openldap.tar --to-repo myharbor.mydomain.com/myproject/dex --include-non-distributable-layer
 
-### Certificate
-Trust is everything, Tanzu Mission Control Self Managed requires certificate, these certificates must be provided via a [clusterissuer](https://cert-manager.io/docs/concepts/issuer) managed by cert-manager, the clusterissuer has to be deployed prior we can start the installation procedure.
+# dex
+-- imgpkg copy --tar images/dex.tar --to-repo myharbor.mydomain.com/myproject/dex --include-non-distributable-layer
+```
 
+### login to tanzu kubernetes clussupervisor
+```
+kubectl vsphere login --server [supervisor ip|fqdn] -u [username] #(optional) --insecure-skip-tls-verify
+```
 
-### (optional) S3 compatible storage
-If you wish to backup your kubernetes environment/workloads
+### modify the tkc/tkc-tmc.yaml file with your values
 
-### (optional) Observability console
-Tanzu Mission Control Self Managed adopted the batteries included approach, during the installation monitoring is installed/configured. We also provide sample grafana dashboard.
+### create the tanzu kubernetes cluster
+```
+kubectl apply -f tkc/tkc-tmc.yaml
 
-## Quickstart environment
-The environment used in this quickstart is composed of the following components
+export clustername=`yq .metadata.name tkc/tkc-tmc.yaml`
+export namespace=`yq .metadata.namespace tkc/tkc-tmc.yaml`
 
-| Components                    | Version   |
-|-------------------------------|:---------:|
-| Tanzu Kubernetes Grid cluster | 1.23.8    |
-| kapp controller               | 0.46.1    |
-| cert-manager                  |           |
-| external-dns                  |           |
+while [[ $(kubectl get cluster $clustername -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}' -n $namespace) != "True" ]]; do
+    echo "waiting for cluster to be ready"
+    sleep 30
+done
+```
+
+### login to tanzu kubernetes cluster
+```
+kubectl vsphere login --server [supervisor ip|fqdn] -u [username] --tanzu-kubernetes-cluster-namespace $namespace --tanzu-kubernetes-cluster-name $clustername #(optional) --insecure-skip-tls-verify
+```
+
+### switch context and create cluster role
+```
+kubectl config set-context $clusternam
+kubectl apply -f config/clusterrolebinding.yaml
+```
+
+### install kapp (only if not present) - as documented here
+
+### install tanzu packages (cert-manager and external-dns)
+
+```
+kubectl apply -f packages/standard/ns.yaml
+kubectl apply -f packages/standard/sa.yaml
+ytt -f config/common-values.yaml -f packages/standard/secrets.yaml | kubectl apply -f -
+
+# kapp-controller (trust harbor)
+kubectl -n tkg-system delete po -l app=kapp-controller
+
+# package repository
+ytt -f config/common-values.yaml -f packages/standard/pkgr.yaml | kubectl apply -f -
+
+export name=`yq .metadata.name packages/standard/pkgr.yaml`
+export namespace=`yq .metadata.namespace packages/standard/pkgr.yaml`
+
+while [[ $(kubectl -n $namespace get pkgr $name -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
+    echo "waiting for repository $name to be ready"
+    sleep 10
+done
+
+# package install
+ytt -f config/common-values.yaml -f packages/standard/pkgi.yaml | kubectl apply -f -
+
+while [[ $(kubectl -n $namespace get pkgi cert-manager -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
+    echo "waiting for cert-manager to be ready"
+    sleep 10
+done
+
+while [[ $(kubectl -n $namespace get pkgi external-dns -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
+    echo "waiting for external-dns to be ready"
+    sleep 10
+done
+```
+
+### configure tanzu mission control self-managed
+```
+kubectl apply -f packages/tmc/ns.yaml
+kubectl apply -f packages/tmc/sa.yaml
+
+# certificate cluster issuer
+ytt -f config/common-values.yaml -f config/localissuer.yaml | kubectl apply -f -
+
+# package repository
+ytt -f config/common-values.yaml -f packages/tmc/pkgr.yaml | kubectl apply -f -
+
+export name=`yq .metadata.name packages/tmc/pkgr.yaml`
+export namespace=`yq .metadata.namespace packages/tmc/pkgr.yaml`
+
+while [[ $(kubectl -n $namespace get pkgr $name -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
+    echo "waiting for repository $name to be ready"
+    sleep 10
+done
+
+# package install
+ytt -f config/common-values.yaml -f packages/tmc/secrets.yaml -f packages/tmc/pkgi.yaml | kubectl apply -f -
+
+while [[ $(kubectl -n $namespace get pkgi contour -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
+    echo "waiting for contour to be ready"
+    sleep 10
+done
+
+# install dex (OIDC)
+ytt -f config/common-values.yaml -f packages/dex/deployment.yaml| kubectl apply -f -
+kubectl annotate packageinstalls tmc -n tmc-local ext.packaging.carvel.dev/ytt-paths-from-secret-name.2=tmc-overlay-override-dex
+kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": true}}'
+kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": false}}'
+ 
+# openldap
+ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl apply -f -
+```

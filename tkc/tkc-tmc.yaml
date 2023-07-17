@@ -1,0 +1,36 @@
+apiVersion: run.tanzu.vmware.com/v1alpha2
+kind: TanzuKubernetesCluster
+metadata:
+  name: tkc-tmc-sm-00
+  namespace: vns-mgmt
+spec:
+  topology:
+    controlPlane:
+      replicas: 1
+      vmClass: best-effort-medium
+      storageClass: tanzu-default
+      volumes:
+        - name: containerd
+          mountPath: /var/lib/containerd
+          capacity:
+            storage: 10Gi
+      tkr:  
+        reference:
+          name: v1.23.15---vmware.1-tkg.4
+    nodePools:
+    - name: workers
+      replicas: 3
+      vmClass: best-effort-large
+      storageClass: tanzu-default
+      volumes:
+        - name: containerd
+          mountPath: /var/lib/containerd
+          capacity:
+            storage: 10Gi
+      tkr:  
+        reference:
+          name: v1.23.15---vmware.1-tkg.4
+  settings:
+    storage:
+      classes: ["tanzu-default"]
+      defaultClass: tanzu-default

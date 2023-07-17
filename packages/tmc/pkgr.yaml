@@ -1,0 +1,13 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageRepository
+metadata:
+  name: tmc-packages
+  namespace: tmc-local
+  annotations:
+    kapp.k14s.io/change-group: "pkgr"
+spec:
+  fetch:
+    imgpkgBundle:
+      image:  #@ "{}/package-repository:{}".format(data.values.registry.tmc.repo,data.values.registry.tmc.version)

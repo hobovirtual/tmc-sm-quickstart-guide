@@ -1,0 +1,40 @@
+#@data/values
+---
+registry:
+  tmc:
+    repo: harbor-00.platform.lab/tmc
+    version: 1.0.0
+  standard:
+    repo: harbor-00.platform.lab/tkg/packages/standard/repo
+    version: v2.2.0
+  openldap:
+    repo: harbor-00.platform.lab/tmc
+    version: 1.2.4
+  busybox:
+    repo: harbor-00.platform.lab/tmc
+    version: latest
+  dex:
+    repo: harbor-00.platform.lab/tmc
+    version: v2.35.3
+
+certmanager:
+  version: 1.10.2+vmware.1-tkg.1
+  clusterissuer: local-issuer
+
+domain: mydomain.com
+
+externaldns:
+  version: 0.12.2+vmware.5-tkg.1
+
+oidc:
+  issuerType: pinniped
+  clientid: tmc-auth
+  clientsecret: secretvalue
+
+trusted:
+  ca: |-
+    -----BEGIN CERTIFICATE-----    
+    -----END CERTIFICATE-----
+  harbor: |-
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----

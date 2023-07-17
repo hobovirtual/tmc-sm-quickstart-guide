@@ -1,0 +1,16 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: tmc
+  namespace: tmc-local
+spec:
+  serviceAccountName: kapp-sa
+  packageRef:
+    refName: tmc.tanzu.vmware.com
+    versionSelection:
+      constraints: #@ data.values.registry.tmc.version
+  values:
+  - secretRef:
+      name: secret-tmc-values
