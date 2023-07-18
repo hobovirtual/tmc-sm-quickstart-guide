@@ -2,26 +2,26 @@
 ---
 registry:
   tmc:
-    repo: hmyharbor.mydomain.com/myproject
+    repo: {{myharbor.mydomain.com}}/{{myproject}}
     version: 1.0.0
   standard:
-    repo: myharbor.mydomain.com/myproject
+    repo: {{myharbor.mydomain.com}}/{{myproject}}
     version: v2.2.0
   openldap:
-    repo: myharbor.mydomain.com/myproject
+    repo: {{myharbor.mydomain.com}}/{{myproject}}
     version: 1.2.4
   busybox:
-    repo: myharbor.mydomain.com/myproject
+    repo: {{myharbor.mydomain.com}}/{{myproject}}
     version: latest
   dex:
-    repo: myharbor.mydomain.com/myproject
-    version: v2.35.3
+    repo: {{myharbor.mydomain.com}}/{{myproject}}
+    version: 2.35.3
 
 certmanager:
   version: 1.10.2+vmware.1-tkg.1
   clusterissuer: local-issuer
 
-domain: mydomain.com
+domain: {{mydomain.com}}
 
 externaldns:
   version: 0.12.2+vmware.5-tkg.1
@@ -33,8 +33,40 @@ oidc:
 
 trusted:
   ca: |-
-    -----BEGIN CERTIFICATE-----    
+    -----BEGIN CERTIFICATE-----
+    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
+    8xZt/oYOG+RuUx8=
     -----END CERTIFICATE-----
   harbor: |-
-    -----BEGIN CERTIFICATE-----
-    -----END CERTIFICATE-----
+   {{ -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----}}
