@@ -178,3 +178,6 @@ kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": fa
 # openldap
 ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl apply -f -
 ```
+
+## add the custom cert to your supervisor tkgserviceconfiguration
+In order for your workload clusters to trust your Tanzu Mission Control Self Managed instance, you will need to add the custom certificate in the trusted section of your TkgServiceConfiguration, please see [documentation](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-059EF257-31AF-4DD2-B475-297C5BCB5F49.html) for more information and instructions
