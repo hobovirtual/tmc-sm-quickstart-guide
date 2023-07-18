@@ -61,7 +61,8 @@ imgpkg copy --tar images/openldap.tar --to-repo $myharbor/$myproject/openldap --
 imgpkg copy --tar images/dex.tar --to-repo $myharbor/$myproject/dex --include-non-distributable-layers
 ```
 
-## Before starting, please make sure you have pushed the Tanzu Mission Control Self Managed containers to your Harbor Registry (see prerequisite)
+## Before starting, please make sure you have pushed the Tanzu Mission Control Self Managed containers to your Harbor Registry 
+see prerequisite section above
 
 ## login to tanzu kubernetes supervisor
 ```
