@@ -1,4 +1,4 @@
-# tanzu mission control - self managed - tkg
+# Tanzu Mission Control - Self Managed
 Hopefully by now you've all heard about Tanzu Mission Control (aka TMC), VMware Tanzu Mission Control is a centralized hub for simplified, multi-cloud, multi-cluster Kubernetes management. More information can be found [here](https://tanzu.vmware.com/mission-control)
 
 Since it's released, Tanzu Mission Control was only available as a VMware Cloud Service, in other words SaaS only. Recently we release an alternative deployment option for Tanzu Mission Control, which is called Self Managed. With this new deployment option, customers who weren't able to use our VMware Cloud Service can benefit from the management capabilities that Tanzu Mission Control offers.
@@ -18,7 +18,7 @@ Please note: a lot of the configuration and instructions in this guide was inspi
 
 Remember, please note this setup is using unsupported configuration
 
-## prerequisite
+## Prerequisite
 - a vSphere cluster with Tanzu Workload Management enabled
 - a linux bootstrap machine with
     - carvel tools [installed](https://carvel.dev/)
@@ -30,7 +30,7 @@ Remember, please note this setup is using unsupported configuration
     2. project with the tanzu packages [see documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-mgmt-clusters-image-copy-airgapped.html) - or you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
     3. project for hosting other containers such as busybox and openldap containers (can be the same harbor project)
 
-## this guide will deploy
+## In this guide we will deploy the following in your environment
 - tanzu kubernetes cluster 1.23+
 - cert-manager 0.11+
 - kapp controller
@@ -41,12 +41,12 @@ Remember, please note this setup is using unsupported configuration
 
 # installation steps
 
-## clone this repo
+## 1 - clone this repo
 ```
 git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide.git
 cd tmc-sm-quickstart-guide
 ```
-## copy busybox - openldap - dex to your registry
+## 2 - copy busybox - openldap - dex to your registry
 ```
 export myharbor=myharbor.mydomain.com
 export myproject=myproject
@@ -64,15 +64,15 @@ imgpkg copy --tar images/dex.tar --to-repo $myharbor/$myproject/dex --include-no
 ## Before starting, please make sure you have pushed the Tanzu Mission Control Self Managed containers to your Harbor Registry 
 see prerequisite section above
 
-## login to tanzu kubernetes supervisor
+## 3 - login to tanzu kubernetes supervisor
 ```
 kubectl vsphere login --server [supervisor ip|fqdn] -u [username] #(optional) --insecure-skip-tls-verify
 ```
 
-## edit the tkc/tkc-tmc.yaml file with your values
+## 4 - edit the tkc/tkc-tmc.yaml file with your values
 Review and replace all values in {{}} and update with your own
 
-## create the tanzu kubernetes cluster
+## 5 - create the tanzu kubernetes cluster
 ```
 kubectl apply -f tkc/tkc-tmc.yaml
 
@@ -85,18 +85,18 @@ while [[ $(kubectl get cluster $clustername -o=jsonpath='{.status.conditions[?(@
 done
 ```
 
-## login to tanzu kubernetes cluster
+## 6 - login to tanzu kubernetes cluster
 ```
 kubectl vsphere login --server [supervisor ip|fqdn] -u [username] --tanzu-kubernetes-cluster-namespace $namespace --tanzu-kubernetes-cluster-name $clustername #(optional) --insecure-skip-tls-verify
 ```
 
-## switch context and create cluster role
+## 7 - switch context and create cluster role
 ```
 kubectl config set-context $clustername
 kubectl apply -f config/clusterrolebinding.yaml
 ```
 
-## validate kapp controller
+## 8 - validate kapp controller
 All recent Tanzu Kubernetes releases should have kapp-controller installed, if not then please install it by following this [guide](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-packages-prep-tkgs-kapp.html)
 
 If you want to validate if it is present in your current Tanzu Kubernetes release
@@ -104,10 +104,10 @@ If you want to validate if it is present in your current Tanzu Kubernetes releas
 kubectl -n tkg-system get po -l app=kapp-controller
 ```
 
-## edit the config/common-values.yaml file with your values
+## 9 - edit the config/common-values.yaml file with your values
 Review and replace all values in {{}} and update with your own
 
-## install tanzu packages (cert-manager and external-dns)
+## 10 - install tanzu packages (cert-manager and external-dns)
 
 ```
 kubectl apply -f packages/standard/ns.yaml
@@ -142,7 +142,7 @@ while [[ $(kubectl -n $namespace get pkgi external-dns -o=jsonpath='{.status.con
 done
 ```
 
-## configure tanzu mission control self-managed
+## 11 - configure tanzu mission control self-managed
 ```
 kubectl apply -f packages/tmc/ns.yaml
 kubectl apply -f packages/tmc/sa.yaml
@@ -179,7 +179,7 @@ kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": fa
 ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl apply -f -
 ```
 
-## add the custom cert to your supervisor tkgserviceconfiguration
+## 12 - add the custom cert to your supervisor tkgserviceconfiguration
 In order for your workload clusters to trust your Tanzu Mission Control Self Managed instance, you will need to add the custom certificate in the trusted section of your TkgServiceConfiguration, please see [documentation](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-059EF257-31AF-4DD2-B475-297C5BCB5F49.html) for more information and instructions
 
 ## What's next??
