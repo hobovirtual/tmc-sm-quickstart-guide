@@ -104,8 +104,10 @@ If you want to validate if it is present in your current Tanzu Kubernetes releas
 kubectl -n tkg-system get po -l app=kapp-controller
 ```
 
-## 9 - edit the config/common-values.yaml file with your values
+## 9 - edit configuration files and update them with your values
 Review and replace all values in {{}} and update with your own
+- config/common-values.yaml
+- packages/standard/secrets.yaml (external-dns)
 
 ## 10 - install tanzu packages (cert-manager and external-dns)
 
