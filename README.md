@@ -185,6 +185,12 @@ ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl 
 In order for your workload clusters to trust your Tanzu Mission Control Self Managed instance, you will need to add the custom certificate in the trusted section of your TkgServiceConfiguration, please see [documentation](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-059EF257-31AF-4DD2-B475-297C5BCB5F49.html) for more information and instructions
 
 ## What's next??
+Login to you newly deployed instance
+
+url: tmc.{{mydomain.com}}
+user: tanzu
+password: VMware1!
+
 If you want to add your supervisor cluster as a management cluster follow this [doc](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-ED4417DC-592C-454A-8292-97F93BD76957.html)
 
 If you want to attach a cluster, see this [doc](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/services/tanzumc-using/GUID-6DF2CE3E-DD07-499B-BC5E-6B3B2E02A070.html)
