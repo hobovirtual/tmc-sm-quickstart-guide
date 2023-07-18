@@ -187,9 +187,11 @@ In order for your workload clusters to trust your Tanzu Mission Control Self Man
 ## What's next??
 Login to you newly deployed instance
 
-url: tmc.{{mydomain.com}}
-user: tanzu
-password: VMware1!
+tmc.{{mydomain.com}}
+
+user  | password
+----- |---------
+tanzu | VMware1!
 
 If you want to add your supervisor cluster as a management cluster follow this [doc](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-ED4417DC-592C-454A-8292-97F93BD76957.html)
 
