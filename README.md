@@ -16,7 +16,7 @@ This guide was tested on Tanzu Kubernetes Grid on vSphere.
 
 Please note: a lot of the configuration and instructions in this guide was inspired from various contributors at VMware.
 
-Remember: please note this setup is using unsupported configuration
+Remember: this setup is using unsupported configuration
 
 ## Prerequisite
 - a vSphere cluster with Tanzu Workload Management enabled
