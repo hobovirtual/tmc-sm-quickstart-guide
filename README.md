@@ -22,7 +22,7 @@ Well we got you covered, this quickstart guide will guide you through the instal
     - docker desktop
     - Tanzu Mission Control Self Managed installer - download from the [Customer Connect download site](https://customerconnect.vmware.com/en/downloads/info/slug/infrastructure_operations_management/vmware_tanzu_mission_control_self_managed/1_0_0)
 - A network accessible Harbor Registry
-    - you need at least one public project for Tanzu Mission Control Self Managed images
+    - you need one public project for Tanzu Mission Control Self Managed images
     - access to tanzu packages repository - you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
         - if you're working with an internet restricted environment, please [see documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-mgmt-clusters-image-copy-airgapped.html)
 
