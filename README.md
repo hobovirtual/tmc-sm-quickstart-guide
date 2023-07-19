@@ -1,11 +1,12 @@
-# Tanzu Mission Control - Self Managed
-Hopefully by now you've all heard about Tanzu Mission Control (aka TMC), VMware Tanzu Mission Control is a centralized hub for simplified, multi-cloud, multi-cluster Kubernetes management. More information can be found [here](https://tanzu.vmware.com/mission-control)
+# Tanzu Mission Control - Self Managed Quick Start
 
-Since it's released, Tanzu Mission Control was only available as a VMware Cloud Service, in other words SaaS only. Recently we release an alternative deployment option for Tanzu Mission Control, which is called Self Managed. With this new deployment option, customers who weren't able to use our VMware Cloud Service can benefit from the management capabilities that Tanzu Mission Control offers.
+This is for testing and evaluation purposes only. This QuickStart guide is intended to install Tanzu Mission Control with minimal requirements.. For production use cases, please refer to the documentation
 
-If you want to read more about Tanzu Mission Control Self Managed, you can read our (release blog)[https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement]
+Tanzu Mission Control (aka TMC), VMware Tanzu Mission Control is a centralized hub for simplified, multi-cloud, multi-cluster Kubernetes management. More information can be found [here](https://tanzu.vmware.com/mission-control)
 
-If you're looking to install Tanzu Mission Control Self Managed, please review the list of requirements [here](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/prepare-cluster.html)
+Tanzu Mission Control has been available to operators as a SaaS offering but is now a deployable application to supported Kubernetes clusters called Tanzu Mission Control Self Managed. This enables customers to utilize the fleet-wide management capabilities of Tanzu Mission Control in organizations where SaaS services are restricted, organizations that need complete application control, or air-gapped environments.
+
+Read more about Tanzu Mission Control Self Managed in the [release blog](https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement)
 
 But what if you're just looking for a quick and easy installation to test Tanzu Mission Control Self Managed in your lab/test environment? Well we got you covered, this quickstart guide will guide you with minimal set of requirements. 
 
@@ -14,12 +15,8 @@ Please note that for Production installation you will need to use the [official 
 # Quickstart Introduction
 This guide was tested on Tanzu Kubernetes Grid on vSphere.
 
-Please note: a lot of the configuration and instructions in this guide was inspired from various contributors at VMware.
-
-Remember: this setup is using unsupported configuration
-
 ## Prerequisite
-- a vSphere cluster with Tanzu Workload Management enabled
+- vSphere with Tanzu enabled on a vSphere cluster
 - a linux bootstrap machine with
     - carvel tools [installed](https://carvel.dev/)
     - kubectl cli installed
@@ -185,13 +182,25 @@ ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl 
 In order for your workload clusters to trust your Tanzu Mission Control Self Managed instance, you will need to add the custom certificate in the trusted section of your TkgServiceConfiguration, please see [documentation](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-059EF257-31AF-4DD2-B475-297C5BCB5F49.html) for more information and instructions
 
 ## What's next??
-Login to you newly deployed instance
+Tanzu Mission Control Self Managed has now been successfully deployed! Access the interface by following using the credentials below.
 
 tmc.{{mydomain.com}}
 
 user  | password
 ----- |---------
 tanzu | VMware1!
+
+To ensure new Tanzu Kubernetes Grid clusters can be managed by Tanzu Mission Control, a custom certificate must be added to the trusted section of your [TkgServiceConfiguration in vSphere with Tanzu](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-4838C85E-398D-4461-9C4E-561FADD42A07.html#external-private-registry-configuration-5). 
+
+Follow the documentation to add cert to the additionalTrustedCAs section and add the following lines under the spec section
+
+```
+spec:
+  trust:
+    additionalTrustedCAs:
+    - name: tmc-sm
+      data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUYxekNDQTcrZ0F3SUJBZ0lVUktsNVFacFB0amVDRHRWZlVDWjFPcUNYcXFvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2dZUXhDekFKQmdOVkJBWVRBbFJTTVJFd0R3WURWUVFJREFoSmMzUmhibUoxYkRFUk1BOEdBMVVFQnd3SQpTWE4wWVc1aWRXd3hGekFWQmdOVkJBb01Ea04xYzNSdmJXVnlMQ0JKYm1NdU1Rc3dDUVlEVlFRTERBSkpWREVwCk1DY0dBMVVFQXd3Z0tpNTBiV011YURKdkxUUXRNVEl3TWpJdWFESnZMblp0ZDJGeVpTNWpiMjB3SGhjTk1qTXcKTmpJd01UQXpPRFEwV2hjTk1qWXdOREE1TVRBek9EUTBXakNCaERFTE1Ba0dBMVVFQmhNQ1ZGSXhFVEFQQmdOVgpCQWdNQ0VsemRHRnVZblZzTVJFd0R3WURWUVFIREFoSmMzUmhibUoxYkRFWE1CVUdBMVVFQ2d3T1EzVnpkRzl0ClpYSXNJRWx1WXk0eEN6QUpCZ05WQkFzTUFrbFVNU2t3SndZRFZRUUREQ0FxTG5SdFl5NW9NbTh0TkMweE1qQXkKTWk1b01tOHVkbTEzWVhKbExtTnZiVENDQWlJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dJUEFEQ0NBZ29DZ2dJQgpBTVZVSzE4dXRKMk91U202Uy9WMDBJQXpiM0swTWhQUFNybEtkdlN2b3lRMzN6cHRVSjg2azBYYWhpNWNmaGtpCmZKdkNkbXJiVEpieGRBWnVyMFpCcXNTeDlnMkx6dkdocGJ6RElpM3dUMnd1NHd3bDZ4QzltbzRPTjI0aDdkVkEKbnc5Vm9jOUNDMDBWWWIxYWRlOTZobGpTRUhPeTM0UU50UG9KRm00d1JlOGJWcnpYZzE5dks2cTJNQTJlbzY2awpYOE5XTFJ0N0d5MXh5bXNpc0ppRGk4VDlLMmhQNHNGdHdJbEZrWENubEJVMHljYlFHSWFaNmFyRHJxZ0grNGt6ClRwZ3U5Uk0wVEpadmdBbEFQRGJmN2Zzd2JxWHAwMXM0b1JTZFZIbXBSZE5KQjh0OVE0V3ZDUWhWTTBPSVBsZ3gKOTNOMHhmZHo4ZGRCMDZOa1Q3czhjSFF4N3duMHZDTUJ6RTBvTzZDY0tnWlVTS0NmdGxhd2w0Q1J3eUlxNVA0dApGNmF6VWUxMEt5RFdvOG9VV3hNYmJQNFRqSmprWDgyck9BaHZMWmpPZi85ZmJTQUc4OS84MDBkU2Z4VlM1RW1ICjlGbWVBOHIvVTVUQ3dGbFoweURNTERKZzRNL3FISVJKcXlTMEZLNVVha3lDbG01MFROdXhvU3ZKKzREVWg0dm0KbjA3MWNjbGUyT2p6ZU5BbDNmclY4UTZtOUY3UkxQdTA1RGJXOXBadjd5cWMrT000ZXRKYUpDUllaVy9ZMG0vNQo0N2tOL3lCS29LM2h5bVpiWi9NNkh2aEd5WWRpVktsdEpYZVpMU2J1MTQ4WEV5Q2tpa2xoaHJHay95WEIyN2JLCjFuVURSU1FBbGlSNnptRlhzRDUwZlFLbkw4ak4vdjNVSHQxbnlmYTczV3dGQWdNQkFBR2pQekE5TUF3R0ExVWQKRXdRRk1BTUJBZjh3RGdZRFZSMFBBUUgvQkFRREFnR0dNQjBHQTFVZERnUVdCQlNQdmZDNGlBT1ZCS2lSbnNscApINDEvdHFEZGRUQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FnRUFKaGE4M0syL1FRUlRydkdXT1pwSU9TQ0N5S3cyCnVkMlk2Wk4raiszY00xeVo3SDA0ZWU2OTd5NVlZVGpoVzczQ2tjVm8xbEJKY1hoYmVuNXcwV0RiK254Vmdxb2gKMVRXSkZXNTBLOXhwN3Z4MHc5NnIvWkhHSVBTSU5VbExHdTF2dWFjVm5aWDA2TFNYZXZ6aHF5ZFBzeE1pQnFmRApHa1FjSlNpVDZWUThVQTlrRjJXdEtKSmEvVWtjSndxZWZGenloWEx5dWVpaXhFbUhjZ25pclB3Q05DRTcwWHJoCnZrQ1ZLaHl2Zlo5aVRnYUlEZTJwNVNpamdteFFmSDQ4VmI4TndOdnNrL24rVGFnbGtzUVM2Y3BOdmxleHhSU1MKQ3RjbmFCU253UjBibDNEdStuajB0V3FybE54YmpWbWt4SjBEUXFIdmZHeFhjS2NMYThUd2JNcERtdzUybEdNaApiZ2hCM1hESGVRbXpvNXBsL24xYVFjR200Zk9LbTZxblBNVUhNZXZCT1VGdFlRSDlYM1FQdzZMUkcraU5paFhOCnU2ZXlGd2t2WXFTRUpxdld3OFNtL0t2QUo5Z1ppQys2emVXYTNMWmZTdHdmSGJlZkREL21TdUI3NEhCNHhSaW4KV3U2N1EyOHkzQXlIa2xVTm1hNlJGaUJtcnZsTTRoVzk3bFo3TGFxQnR0Y21WWmFHbVRseUNWRTFrTTE4TEF5RgpmQWlFN3g4UzJMRHdUWW1vTGZkQm1IbWZ5ZzY0RGNWdFdDV1dueXZkY29paEhFVWVTUEhCT2FUQWdCYlFaSTFuCm5FanB1bC9uUWpiZWU3RG85eGd2cXUrV3BzTXd3WVA3bnBUR3pOb3dtQkN3NE1RMmRJSExVbTJPT3FUckNQQ0YKOHhadC9vWU9HK1J1VXg4PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t
+```
 
 If you want to add your supervisor cluster as a management cluster follow this [doc](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-ED4417DC-592C-454A-8292-97F93BD76957.html)
 
