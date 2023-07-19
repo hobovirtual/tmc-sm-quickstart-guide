@@ -15,7 +15,6 @@ Well we got you covered, this quickstart guide will guide you through the instal
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
-    - with kapp-controller
 - A linux bootstrap machine with
     - carvel tools [installed](https://carvel.dev/)
     - kubectl cli installed
