@@ -1,4 +1,4 @@
-# Tanzu Mission Control - Self Managed Quick Start
+# Tanzu Mission Control - Self Managed Quickstart
 
 This is for testing and evaluation purposes only. This QuickStart guide is intended to install Tanzu Mission Control with minimal requirements. For production use cases, please refer to the official [documentation](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/index-sm-install.html)
 
@@ -9,9 +9,9 @@ Tanzu Mission Control has been available to operators as a SaaS offering but is 
 Read more about Tanzu Mission Control Self Managed in this [release blog](https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement)
 
 # Quickstart Introduction
-But what if you're just looking for a quick and easy installation to test Tanzu Mission Control Self Managed in your lab/test environment? 
+But what if you're just looking for a quick and easy way to test Tanzu Mission Control Self Managed in your lab/test environment? 
 
-Well we got you covered, this quickstart guide will guide you with minimal set of requirements.
+Well we got you covered, this quickstart guide will guide you through the installation with minimal set of requirements.
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
