@@ -1,16 +1,14 @@
 # Tanzu Mission Control - Self Managed Quick Start
 
-This is for testing and evaluation purposes only. This QuickStart guide is intended to install Tanzu Mission Control with minimal requirements.. For production use cases, please refer to the documentation
+This is for testing and evaluation purposes only. This QuickStart guide is intended to install Tanzu Mission Control with minimal requirements. For production use cases, please refer to the official [documentation](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/index-sm-install.html)
 
-Tanzu Mission Control (aka TMC), VMware Tanzu Mission Control is a centralized hub for simplified, multi-cloud, multi-cluster Kubernetes management. More information can be found [here](https://tanzu.vmware.com/mission-control)
+Tanzu Mission Control (aka TMC), is a centralized hub for simplified, multi-cloud, multi-cluster Kubernetes management. More information can be found [here](https://tanzu.vmware.com/mission-control)
 
 Tanzu Mission Control has been available to operators as a SaaS offering but is now a deployable application to supported Kubernetes clusters called Tanzu Mission Control Self Managed. This enables customers to utilize the fleet-wide management capabilities of Tanzu Mission Control in organizations where SaaS services are restricted, organizations that need complete application control, or air-gapped environments.
 
-Read more about Tanzu Mission Control Self Managed in the [release blog](https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement)
+Read more about Tanzu Mission Control Self Managed in the [blog](https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement)
 
 But what if you're just looking for a quick and easy installation to test Tanzu Mission Control Self Managed in your lab/test environment? Well we got you covered, this quickstart guide will guide you with minimal set of requirements. 
-
-Please note that for Production installation you will need to use the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/index-sm-install.html)
 
 # Quickstart Introduction
 This guide was tested on Tanzu Kubernetes Grid on vSphere.
@@ -45,8 +43,8 @@ cd tmc-sm-quickstart-guide
 ```
 ## 2 - copy busybox - openldap - dex to your registry
 ```
-export myharbor=myharbor.mydomain.com
-export myproject=myproject
+export myharbor={{myharbor.mydomain.com}}
+export myproject={{myproject}}
 
 # busybox
 imgpkg copy --tar images/busybox.tar --to-repo $myharbor/$myproject/busybox --include-non-distributable-layers
