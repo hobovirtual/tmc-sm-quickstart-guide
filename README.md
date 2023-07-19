@@ -15,24 +15,29 @@ Well we got you covered, this quickstart guide will guide you through the instal
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
-- a linux bootstrap machine with
+    - with kapp-controller
+- A linux bootstrap machine with
     - carvel tools [installed](https://carvel.dev/)
     - kubectl cli installed
     - yq [installed](https://github.com/mikefarah/yq/#install)
     - docker desktop
-- harbor projects
-    1. project with the tmc-sm containers see the [Download and stage the installation images section](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html)
-    2. project with the tanzu packages [see documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-mgmt-clusters-image-copy-airgapped.html) - or you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
-    3. project for hosting other containers such as busybox and openldap containers (can be the same harbor project)
+- A network accessible Harbor Registry
+    - you need at least one public project for Tanzu Mission Control Self Managed images
+    - access to tanzu packages repository - you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
+        - if you're working with an internet restricted environment, please [see documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-mgmt-clusters-image-copy-airgapped.html)
+- Download the installer from the [Customer Connect download site](https://customerconnect.vmware.com/en/downloads/info/slug/infrastructure_operations_management/vmware_tanzu_mission_control_self_managed/1_0_0)
 
 ## In this guide we will deploy the following in your environment
 - tanzu kubernetes cluster 1.23+
 - cert-manager 0.11+
-- kapp controller
+    - clusterissuer using a self signed certificate (included)
 - external-dns for dynamic dns configuration
     - this is optional but recommended, if you don't want to use dynamic dns configuration you can create two dns entries manually
         - tmc.mydomain.com
         - *.tmc.mydomain.com
+    - the values provided in this guide are for configuring external-dns with a BIND server, if you're planning to use other or if you want more configuration option, please refer to this [docs](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-packages-external-dns.html#prepare-the-configuration-file-for-the-externaldns-package-3)
+- dex (OIDC provider)
+- opendlap (for user authentication)
 
 # installation steps
 
@@ -41,23 +46,29 @@ Well we got you covered, this quickstart guide will guide you through the instal
 git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide.git
 cd tmc-sm-quickstart-guide
 ```
-## 2 - copy busybox - openldap - dex to your registry
+## 2 - push images to your harbor registry
+### 2.1. prepare bootstrap machine [documented here](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html#download-and-stage-the-installation-images-0)
 ```
+mkdir tanzumc
+tar -xf tmc-self-managed-1.0.0.tar -C ./tanzumc
+
+Add the root CA cert for Harbor to the /etc/ssl/certs path of the jumpbox for system-wide use. This enables the image push to the Harbor repository
+
 export myharbor={{myharbor.mydomain.com}}
 export myproject={{myproject}}
-
-# busybox
-imgpkg copy --tar images/busybox.tar --to-repo $myharbor/$myproject/busybox --include-non-distributable-layers
-
-# openldap
-imgpkg copy --tar images/openldap.tar --to-repo $myharbor/$myproject/openldap --include-non-distributable-layers
-
-# dex
-imgpkg copy --tar images/dex.tar --to-repo $myharbor/$myproject/dex --include-non-distributable-layers
 ```
 
-## Before starting, please make sure you have pushed the Tanzu Mission Control Self Managed containers to your Harbor Registry 
-see prerequisite section above
+### 2.2. push tmc images to harbor
+```
+tanzumc/tmc-sm push-images harbor --project $myharbor/$myproject --username {{username}} --password {{password}}  
+```
+
+### 2.3. push images required for dex + openldap to harbor
+```
+imgpkg copy --tar images/busybox.tar --to-repo $myharbor/$myproject/busybox --include-non-distributable-layers
+imgpkg copy --tar images/openldap.tar --to-repo $myharbor/$myproject/openldap --include-non-distributable-layers
+imgpkg copy --tar images/dex.tar --to-repo $myharbor/$myproject/dex --include-non-distributable-layers
+```
 
 ## 3 - login to tanzu kubernetes supervisor
 ```
@@ -66,6 +77,11 @@ kubectl vsphere login --server {{supervisor ip|fqdn}} -u {{username}} #(optional
 
 ## 4 - edit the tkc/tkc-tmc.yaml file with your values
 Review and replace all values in {{}} and update with your own
+
+| template value | example value |
+| -------------- | ---------- |
+| {{vsphere namespace}} | vns-sanbox |
+| {{storageclass}} | vsan-default-storage-policy |
 
 ## 5 - create the tanzu kubernetes cluster
 ```
@@ -101,8 +117,25 @@ kubectl -n tkg-system get po -l app=kapp-controller
 
 ## 9 - edit configuration files and update them with your values
 Review and replace all values in {{}} and update with your own
-- config/common-values.yaml
-- packages/standard/secrets.yaml (external-dns)
+### config/common-values.yaml
+
+| template value | example value |
+| -------------- | ---------- |
+| {{myharbor.mydomain.com}} | harbor.tanzu.lab |
+| {{myproject}} | tmc |
+| {{mydomain.com}} | tmc.tanzu.lab |
+| {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}} | your harbor certificate |
+
+### packages/standard/secrets.yaml (external-dns)
+
+| template value | example value |
+| -------------- | ---------- |
+| {{owner id}} | tmc.tanzu.lab |
+| {{dns1, dns2}} | 192.168.2.1,192.168.1.1 |
+| {{dns zone}} | tanzu.lab |
+| {{domain filter}} | tanzu.lab |
+
+*NOTE: If you don't want to use external-dns, you can either remove the section from the secrets.yaml and pkgi.yaml files or leave the default*
 
 ## 10 - install tanzu packages (cert-manager and external-dns)
 
@@ -190,7 +223,7 @@ tanzu | VMware1!
 
 To ensure new Tanzu Kubernetes Grid clusters can be managed by Tanzu Mission Control, a custom certificate must be added to the trusted section of your [TkgServiceConfiguration in vSphere with Tanzu](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-4838C85E-398D-4461-9C4E-561FADD42A07.html#external-private-registry-configuration-5). 
 
-Follow the documentation to add cert to the additionalTrustedCAs section and add the following lines under the spec section
+Follow the documentation to add cert to the additionalTrustedCAs section and add the following lines under the spec section (please note that if you're using your own certificate you will need to modify the data value)
 
 ```
 spec:

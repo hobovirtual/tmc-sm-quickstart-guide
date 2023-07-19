@@ -68,5 +68,4 @@ trusted:
     8xZt/oYOG+RuUx8=
     -----END CERTIFICATE-----
   harbor: |-
-   {{ -----BEGIN CERTIFICATE-----
-    -----END CERTIFICATE-----}}
+   {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}}
