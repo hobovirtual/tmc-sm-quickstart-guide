@@ -47,6 +47,8 @@ kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.in
 # installation steps
 
 ## 1 - clone this repo
+From your linux bootstrap machine
+
 ```
 git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide.git
 cd tmc-sm-quickstart-guide
