@@ -54,7 +54,7 @@ git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide.git
 cd tmc-sm-quickstart-guide
 ```
 ## 2 - push images to your harbor registry
-### 2.1. prepare bootstrap machine - for more information you can read the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html#download-and-stage-the-installation-images-0)
+### 2.1 - prepare bootstrap machine - for more information you can read the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html#download-and-stage-the-installation-images-0)
 ```
 mkdir tanzumc
 tar -xf tmc-self-managed-1.0.0.tar -C ./tanzumc
@@ -65,12 +65,12 @@ export myproject={{myproject}}
 
 You also need to add the root CA certificate of Harbor to the /etc/ssl/certs path of the jumpbox for system-wide use. This enables the image push to the Harbor repository in next step.
 
-### 2.2. push tmc images to harbor
+### 2.2 - push tmc images to harbor
 ```
 tanzumc/tmc-sm push-images harbor --project $myharbor/$myproject --username {{username}} --password {{password}}  
 ```
 
-### 2.3. push images required for dex + openldap to harbor
+### 2.3 - push images required for dex + openldap to harbor
 ```
 imgpkg copy --tar images/busybox.tar --to-repo $myharbor/$myproject/busybox --include-non-distributable-layers
 imgpkg copy --tar images/openldap.tar --to-repo $myharbor/$myproject/openldap --include-non-distributable-layers
