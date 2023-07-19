@@ -18,7 +18,7 @@ This guide was tested on Tanzu Kubernetes Grid on vSphere.
 - a linux bootstrap machine with
     - carvel tools [installed](https://carvel.dev/)
     - kubectl cli installed
-    - yq
+    - yq [installed](https://github.com/mikefarah/yq/#install)
     - docker desktop
 - harbor projects
     1. project with the tmc-sm containers see the [Download and stage the installation images section](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html)
