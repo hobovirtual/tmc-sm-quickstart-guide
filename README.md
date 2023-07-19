@@ -31,13 +31,19 @@ Well we got you covered, this quickstart guide will guide you through the instal
 - tanzu kubernetes cluster 1.23+
 - cert-manager 0.11+
     - clusterissuer using a self signed certificate (included)
-- external-dns for dynamic dns configuration
-    - this is optional but recommended, if you don't want to use dynamic dns configuration you can create two dns entries manually (DNS entries will point to the contour-envoy load balancer IP once deployed in step 11 - kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.ingress[0].ip'})
-        - tmc.mydomain.com 
-        - *.tmc.mydomain.com
+- external-dns for dynamic dns configuration - this is optional but recommended "*"
     - the values provided in this guide are for configuring external-dns with a BIND server, if you're planning to use other or if you want more configuration option, please refer to this [docs](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-packages-external-dns.html#prepare-the-configuration-file-for-the-externaldns-package-3)
 - dex (OIDC provider)
 - opendlap (for user authentication)
+
+"*" *If you don't want to use dynamic dns configuration you can create two dns entries manually*
+- tmc.mydomain.com 
+- *.tmc.mydomain.com
+
+DNS entries will point to the contour-envoy load balancer IP once deployed in step 11 - you can easily retrieve the IP using this command
+```
+kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.ingress[0].ip'})
+```
 
 # installation steps
 
