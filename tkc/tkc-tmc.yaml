@@ -16,7 +16,7 @@ spec:
             storage: 10Gi
       tkr:  
         reference:
-          name: v1.23.8---vmware.3-tkg.1
+          name: v1.23.15---vmware.1
     nodePools:
     - name: workers
       replicas: 3
@@ -29,7 +29,7 @@ spec:
             storage: 10Gi
       tkr:  
         reference:
-          name: v1.23.8---vmware.3-tkg.1
+          name: v1.23.15---vmware.1
   settings:
     storage:
       classes: ["{{storageclass}}"]

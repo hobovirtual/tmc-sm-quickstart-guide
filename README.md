@@ -47,16 +47,16 @@ git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide.git
 cd tmc-sm-quickstart-guide
 ```
 ## 2 - push images to your harbor registry
-### 2.1. prepare bootstrap machine [documented here](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html#download-and-stage-the-installation-images-0)
+### 2.1. prepare bootstrap machine - for more information you can read the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html#download-and-stage-the-installation-images-0)
 ```
 mkdir tanzumc
 tar -xf tmc-self-managed-1.0.0.tar -C ./tanzumc
 
-Add the root CA cert for Harbor to the /etc/ssl/certs path of the jumpbox for system-wide use. This enables the image push to the Harbor repository
-
 export myharbor={{myharbor.mydomain.com}}
 export myproject={{myproject}}
 ```
+
+You also need to add the root CA certificate of Harbor to the /etc/ssl/certs path of the jumpbox for system-wide use. This enables the image push to the Harbor repository in next step.
 
 ### 2.2. push tmc images to harbor
 ```
@@ -107,10 +107,10 @@ kubectl config set-context $clustername
 kubectl apply -f config/clusterrolebinding.yaml
 ```
 
-## 8 - validate kapp controller
-All recent Tanzu Kubernetes releases should have kapp-controller installed, if not then please install it by following this [guide](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-packages-prep-tkgs-kapp.html)
+## 8 - validate that kapp controller is available
+Recent Tanzu Kubernetes releases should have kapp-controller installed, if you're using an older release, then please install it by following the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-packages-prep-tkgs-kapp.html)
 
-If you want to validate if it is present in your current Tanzu Kubernetes release
+If you want to validate if kapp-controller is present in your tanzu kubernetes cluster
 ```
 kubectl -n tkg-system get po -l app=kapp-controller
 ```
