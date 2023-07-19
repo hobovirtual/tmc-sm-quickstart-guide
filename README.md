@@ -6,7 +6,7 @@ Tanzu Mission Control (aka TMC), is a centralized hub for simplified, multi-clou
 
 Tanzu Mission Control has been available to operators as a SaaS offering but is now a deployable application to supported Kubernetes clusters called Tanzu Mission Control Self Managed. This enables customers to utilize the fleet-wide management capabilities of Tanzu Mission Control in organizations where SaaS services are restricted, organizations that need complete application control, or air-gapped environments.
 
-Read more about Tanzu Mission Control Self Managed in the [blog](https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement)
+Read more about Tanzu Mission Control Self Managed in this [release blog](https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement)
 
 But what if you're just looking for a quick and easy installation to test Tanzu Mission Control Self Managed in your lab/test environment? Well we got you covered, this quickstart guide will guide you with minimal set of requirements. 
 
