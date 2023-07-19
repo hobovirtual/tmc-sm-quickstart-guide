@@ -27,7 +27,7 @@ Well we got you covered, this quickstart guide will guide you through the instal
     - access to tanzu packages repository - you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
         - if you're working with an internet restricted environment, please [see documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-mgmt-clusters-image-copy-airgapped.html)
 
-## In this guide we will deploy the following in your environment
+## In this guide we will deploy the following components
 - tanzu kubernetes cluster 1.23+
 - cert-manager 0.11+
     - clusterissuer using a self signed certificate (included)
