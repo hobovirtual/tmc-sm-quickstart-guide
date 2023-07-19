@@ -8,10 +8,10 @@ Tanzu Mission Control has been available to operators as a SaaS offering but is 
 
 Read more about Tanzu Mission Control Self Managed in this [release blog](https://tanzu.vmware.com/content/blog/vmware-tanzu-mission-control-self-managed-announcement)
 
-But what if you're just looking for a quick and easy installation to test Tanzu Mission Control Self Managed in your lab/test environment? Well we got you covered, this quickstart guide will guide you with minimal set of requirements. 
-
 # Quickstart Introduction
-This guide was tested on Tanzu Kubernetes Grid on vSphere.
+But what if you're just looking for a quick and easy installation to test Tanzu Mission Control Self Managed in your lab/test environment? 
+
+Well we got you covered, this quickstart guide will guide you with minimal set of requirements.
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
