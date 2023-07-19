@@ -61,7 +61,7 @@ see prerequisite section above
 
 ## 3 - login to tanzu kubernetes supervisor
 ```
-kubectl vsphere login --server [supervisor ip|fqdn] -u [username] #(optional) --insecure-skip-tls-verify
+kubectl vsphere login --server {{supervisor ip|fqdn}} -u {{username}} #(optional) --insecure-skip-tls-verify
 ```
 
 ## 4 - edit the tkc/tkc-tmc.yaml file with your values
@@ -82,7 +82,7 @@ done
 
 ## 6 - login to tanzu kubernetes cluster
 ```
-kubectl vsphere login --server [supervisor ip|fqdn] -u [username] --tanzu-kubernetes-cluster-namespace $namespace --tanzu-kubernetes-cluster-name $clustername #(optional) --insecure-skip-tls-verify
+kubectl vsphere login --server {{supervisor ip|fqdn}} -u {{username}} --tanzu-kubernetes-cluster-namespace $namespace --tanzu-kubernetes-cluster-name $clustername #(optional) --insecure-skip-tls-verify
 ```
 
 ## 7 - switch context and create cluster role
