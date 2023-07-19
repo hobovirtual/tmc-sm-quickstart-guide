@@ -219,7 +219,7 @@ ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl 
 ## What's next??
 Tanzu Mission Control Self Managed has now been successfully deployed! Access the interface by following using the credentials below.
 
-tmc.{{mydomain.com}}
+https://tmc.{{mydomain.com}}
 
 user  | password
 ----- |---------
