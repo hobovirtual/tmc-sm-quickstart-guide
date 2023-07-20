@@ -15,12 +15,8 @@ Well we got you covered, this quickstart guide will guide you through the instal
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
-- A linux bootstrap machine with
-    - carvel tools [installed](https://carvel.dev/)
-    - kubectl cli installed
-    - yq [installed](https://github.com/mikefarah/yq/#install)
-    - docker desktop
-    - Tanzu Mission Control Self Managed installer - download from the [Customer Connect download site](https://customerconnect.vmware.com/en/downloads/info/slug/infrastructure_operations_management/vmware_tanzu_mission_control_self_managed/1_0_0)
+- A linux X86_X64 machine with
+    - docker desktop installed
 - A network accessible Harbor Registry
     - you need one public project for Tanzu Mission Control Self Managed images
     - access to tanzu packages repository - you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
@@ -41,48 +37,52 @@ Well we got you covered, this quickstart guide will guide you through the instal
 
 DNS entries will point to the contour-envoy load balancer IP once deployed in step 11 - you can easily retrieve the IP using this command
 ```
-kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.ingress[0].ip'})
+kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.ingress[0].ip'}
 ```
 
 # installation steps
 
 ## 1 - clone this repo
-From your linux bootstrap machine
-
 ```
 git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide.git
 cd tmc-sm-quickstart-guide
 ```
 ## 2 - push images to your harbor registry
-### 2.1 - prepare bootstrap machine - for more information you can read the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html#download-and-stage-the-installation-images-0)
-```
-mkdir tanzumc
-tar -xf tmc-self-managed-1.0.0.tar -C ./tanzumc
+### 2.1 - download and extract Tanzu Mission Control Self Managed installer in the current directory (from your X86_X64 machine)
+download from the [Customer Connect download site](https://customerconnect.vmware.com/en/downloads/info/slug/infrastructure_operations_management/vmware_tanzu_mission_control_self_managed/1_0_0)
 
-export myharbor={{myharbor.mydomain.com}}
-export myproject={{myproject}}
 ```
-
-You also need to add the root CA certificate of Harbor to the /etc/ssl/certs path of the jumpbox for system-wide use. This enables the image push to the Harbor repository in next step.
-
-### 2.2 - push tmc images to harbor
-```
-tanzumc/tmc-sm push-images harbor --project $myharbor/$myproject --username {{username}} --password {{password}}  
+mkdir tmc
+tar -xf tmc-self-managed-1.0.0.tar -C ./tmc
 ```
 
-### 2.3 - push images required for dex + openldap to harbor
+### 2.2 - build local docker image
+Update the bootstrap/harbor.crt file with your harbor certificate
+
+Now let's build our local docker image that will do the work for us
+
 ```
-imgpkg copy --tar images/busybox.tar --to-repo $myharbor/$myproject/busybox --include-non-distributable-layers
-imgpkg copy --tar images/openldap.tar --to-repo $myharbor/$myproject/openldap --include-non-distributable-layers
-imgpkg copy --tar images/dex.tar --to-repo $myharbor/$myproject/dex --include-non-distributable-layers
+docker build -t bootstrap bootstrap/.
 ```
 
-## 3 - login to tanzu kubernetes supervisor
+### 2.3 - push images to harbor
+Update all values in {{}} with your registry values
+
+| value | description |
+| ----- | --------- |
+| {{myharbor.mydomain.com}}| harbor fully qualified domain name or ip |
+| {{myproject}}| public harbor project where all the container images will be stored |
+| {{username}} | harbor username |
+| {{passwword}} | harbor password |
+
+
 ```
-kubectl vsphere login --server {{supervisor ip|fqdn}} -u {{username}} #(optional) --insecure-skip-tls-verify
+docker run --rm -v $PWD/scripts:/work/scripts -v $PWD/images:/work/images -v $PWD/tmc:/work -e IMGPKG_REGISTRY_HOSTNAME={{myharbor.mydomain.com}} -e PROJECT={{myproject}} -e IMGPKG_REGISTRY_USERNAME={{username}} -e IMGPKG_REGISTRY_PASSWORD={{password}} -it bootstrap push-images
 ```
 
-## 4 - edit the tkc/tkc-tmc.yaml file with your values
+## 3 - create a tanzu kubernetes cluster
+
+### 3.1 - edit the tkc/tkc-tmc.yaml file with your values
 Review and replace all values in {{}} and update with your own
 
 | template value | example value |
@@ -90,31 +90,21 @@ Review and replace all values in {{}} and update with your own
 | {{vsphere namespace}} | vns-sanbox |
 | {{storageclass}} | vsan-default-storage-policy |
 
-## 5 - create the tanzu kubernetes cluster
-```
-kubectl apply -f tkc/tkc-tmc.yaml
 
-export clustername=`yq .metadata.name tkc/tkc-tmc.yaml`
-export namespace=`yq .metadata.namespace tkc/tkc-tmc.yaml`
+### 3.2 - create the tanzu kubernetes cluster
+Update all values in {{}} with your registry values
 
-while [[ $(kubectl get cluster $clustername -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}' -n $namespace) != "True" ]]; do
-    echo "waiting for cluster to be ready"
-    sleep 30
-done
-```
+| value | description |
+| ----- | --------- |
+| {{supervisor ip-fqdn}} | vsphere with tanzu supervisor fully qualified domain name or ip |
+| {{username}} | supervisor username |
+| {{passwword}} | supervisor password |
 
-## 6 - login to tanzu kubernetes cluster
 ```
-kubectl vsphere login --server {{supervisor ip|fqdn}} -u {{username}} --tanzu-kubernetes-cluster-namespace $namespace --tanzu-kubernetes-cluster-name $clustername #(optional) --insecure-skip-tls-verify
+docker run --rm -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -e SUPERVISOR={{supervisor ip-fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tkc
 ```
 
-## 7 - switch context and create cluster role
-```
-kubectl config set-context $clustername
-kubectl apply -f config/clusterrolebinding.yaml
-```
-
-## 8 - validate that kapp controller is available
+## 4 - validate that kapp controller is available
 Recent Tanzu Kubernetes releases should have kapp-controller installed, if you're using an older release, then please install it by following the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-packages-prep-tkgs-kapp.html)
 
 If you want to validate if kapp-controller is present in your tanzu kubernetes cluster
@@ -122,9 +112,11 @@ If you want to validate if kapp-controller is present in your tanzu kubernetes c
 kubectl -n tkg-system get po -l app=kapp-controller
 ```
 
-## 9 - edit configuration files and update them with your values
+## 5 - install and configure tanzu packages
+
+### 5.1 edit configuration files and update them with your values
 Review and replace all values in {{}} and update with your own
-### config/common-values.yaml
+#### config/common-values.yaml
 
 | template value | example value |
 | -------------- | ---------- |
@@ -133,7 +125,7 @@ Review and replace all values in {{}} and update with your own
 | {{mydomain.com}} | tmc.tanzu.lab |
 | {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}} | your harbor certificate |
 
-### packages/standard/secrets.yaml (external-dns)
+#### packages/standard/secrets.yaml (external-dns)
 
 | template value | example value |
 | -------------- | ---------- |
@@ -144,78 +136,26 @@ Review and replace all values in {{}} and update with your own
 
 *NOTE: If you don't want to use external-dns, you can either remove the section from the secrets.yaml and pkgi.yaml files or leave the default*
 
-## 10 - install tanzu packages (cert-manager and external-dns)
+### 5.2 - install tanzu packages (cert-manager and external-dns)
+
+Update all values in {{}} with your registry values
+
+| value | description |
+| ----- | --------- |
+| {{supervisor ip-fqdn}} | vsphere with tanzu supervisor fully qualified domain name or ip |
+| {{username}} | supervisor username |
+| {{passwword}} | supervisor password |
 
 ```
-kubectl apply -f packages/standard/ns.yaml
-kubectl apply -f packages/standard/sa.yaml
-ytt -f config/common-values.yaml -f packages/standard/secrets.yaml | kubectl apply -f -
-
-# kapp-controller (trust harbor)
-kubectl -n tkg-system delete po -l app=kapp-controller
-
-# package repository
-ytt -f config/common-values.yaml -f packages/standard/pkgr.yaml | kubectl apply -f -
-
-export name=`yq .metadata.name packages/standard/pkgr.yaml`
-export namespace=`yq .metadata.namespace packages/standard/pkgr.yaml`
-
-while [[ $(kubectl -n $namespace get pkgr $name -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for repository $name to be ready"
-    sleep 10
-done
-
-# package install
-ytt -f config/common-values.yaml -f packages/standard/pkgi.yaml | kubectl apply -f -
-
-while [[ $(kubectl -n $namespace get pkgi cert-manager -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for cert-manager to be ready"
-    sleep 10
-done
-
-while [[ $(kubectl -n $namespace get pkgi external-dns -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for external-dns to be ready"
-    sleep 10
-done
+docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip-fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tanzu-packages
 ```
 
-## 11 - configure tanzu mission control self-managed
+## 6 - install configure tanzu mission control self-managed
 ```
-kubectl apply -f packages/tmc/ns.yaml
-kubectl apply -f packages/tmc/sa.yaml
-
-# certificate cluster issuer
-ytt -f config/common-values.yaml -f config/localissuer.yaml | kubectl apply -f -
-
-# package repository
-ytt -f config/common-values.yaml -f packages/tmc/pkgr.yaml | kubectl apply -f -
-
-export name=`yq .metadata.name packages/tmc/pkgr.yaml`
-export namespace=`yq .metadata.namespace packages/tmc/pkgr.yaml`
-
-while [[ $(kubectl -n $namespace get pkgr $name -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for repository $name to be ready"
-    sleep 10
-done
-
-# package install
-ytt -f config/common-values.yaml -f packages/tmc/secrets.yaml -f packages/tmc/pkgi.yaml | kubectl apply -f -
-
-while [[ $(kubectl -n $namespace get pkgi contour -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for contour to be ready"
-    sleep 10
-done
-
-# install dex (OIDC)
-ytt -f config/common-values.yaml -f packages/dex/deployment.yaml| kubectl apply -f -
-kubectl annotate packageinstalls tmc -n tmc-local ext.packaging.carvel.dev/ytt-paths-from-secret-name.2=tmc-overlay-override-dex
-kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": true}}'
-kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": false}}'
- 
-# openldap
-ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl apply -f -
+docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip-fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tmc-install
 ```
 
+*please note the tanzu misssion control self managed installation can take several minutes*
 ## What's next??
 Tanzu Mission Control Self Managed has now been successfully deployed! Access the interface by following using the credentials below.
 
