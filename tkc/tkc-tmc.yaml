@@ -20,7 +20,7 @@ spec:
     nodePools:
     - name: workers
       replicas: 3
-      vmClass: best-effort-medium
+      vmClass: best-effort-large
       storageClass: {{storageclass}}
       volumes:
         - name: containerd

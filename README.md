@@ -15,8 +15,8 @@ Well we got you covered, this quickstart guide will guide you through the instal
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
-- A X86_X64 machine with
-    - docker desktop
+- A linux X86_X64 machine with
+    - docker desktop installed
 - A network accessible Harbor Registry
     - you need one public project for Tanzu Mission Control Self Managed images
     - access to tanzu packages repository - you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
@@ -37,7 +37,7 @@ Well we got you covered, this quickstart guide will guide you through the instal
 
 DNS entries will point to the contour-envoy load balancer IP once deployed in step 11 - you can easily retrieve the IP using this command
 ```
-kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.ingress[0].ip'})
+kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.ingress[0].ip'}
 ```
 
 # installation steps
@@ -66,9 +66,18 @@ docker build -t bootstrap bootstrap/.
 ```
 
 ### 2.3 - push images to harbor
-Update all values in {{}} with your own
+Update all values in {{}} with your registry values
+
+| value | descripton |
+| ----- | --------- |
+| {{myharbor.mydomain.com}}| harbor fully qualified domain name or ip |
+| {{myproject}}| public harbor project where all the container images will be stored |
+| {{username}} | harbor username |
+| {{passwword}} | harbor password |
+
+
 ```
-docker run --rm -v $PWD/images:/work/images -v $PWD/tmc:/work -e IMGPKG_REGISTRY_HOSTNAME={{myharbor.mydomain.com}} -e PROJECT={{myproject}} -e IMGPKG_REGISTRY_USERNAME={{username}} -e IMGPKG_REGISTRY_PASSWORD={{password}} -it bootstrap
+docker run --rm -v $PWD/scripts:/work/scripts -v $PWD/images:/work/images -v $PWD/tmc:/work -e IMGPKG_REGISTRY_HOSTNAME={{myharbor.mydomain.com}} -e PROJECT={{myproject}} -e IMGPKG_REGISTRY_USERNAME={{username}} -e IMGPKG_REGISTRY_PASSWORD={{password}} -it bootstrap push-images
 ```
 
 ## 3 - create a tanzu kubernetes cluster
@@ -81,7 +90,16 @@ Review and replace all values in {{}} and update with your own
 | {{vsphere namespace}} | vns-sanbox |
 | {{storageclass}} | vsan-default-storage-policy |
 
+
 ### 3.2 - create the tanzu kubernetes cluster
+Update all values in {{}} with your registry values
+
+| value | descripton |
+| ----- | --------- |
+| {{supervisor ip|fqdn}} | vsphere with tanzu supervisor fully qualified domain name or ip |
+| {{username}} | supervisor username |
+| {{passwword}} | supervisor password |
+
 ```
 docker run --rm -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tkc
 ```
@@ -120,6 +138,14 @@ Review and replace all values in {{}} and update with your own
 
 ### 5.2 - install tanzu packages (cert-manager and external-dns)
 
+Update all values in {{}} with your registry values
+
+| value | descripton |
+| ----- | --------- |
+| {{supervisor ip|fqdn}} | vsphere with tanzu supervisor fully qualified domain name or ip |
+| {{username}} | supervisor username |
+| {{passwword}} | supervisor password |
+
 ```
 docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tanzu-packages
 ```
@@ -129,6 +155,7 @@ docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PW
 docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tmc-install
 ```
 
+*please note the tanzu misssion control self managed installation can take several minutes*
 ## What's next??
 Tanzu Mission Control Self Managed has now been successfully deployed! Access the interface by following using the credentials below.
 

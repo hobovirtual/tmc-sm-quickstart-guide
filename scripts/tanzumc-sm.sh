@@ -103,6 +103,11 @@ then
     # openldap
     ytt -f /work/config/common-values.yaml -f /work/packages/openldap/deployment.yaml | kubectl apply -f -
 
+    while [[ $(kubectl -n $namespace get pkgi tmc -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
+        echo "waiting for tmc to be ready"
+        sleep 30
+    done
+
 elif [ $1 = "help" ]
 then
     echo "help!!!!"
