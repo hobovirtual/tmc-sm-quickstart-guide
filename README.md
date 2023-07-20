@@ -68,7 +68,7 @@ docker build -t bootstrap bootstrap/.
 ### 2.3 - push images to harbor
 Update all values in {{}} with your registry values
 
-| value | descripton |
+| value | description |
 | ----- | --------- |
 | {{myharbor.mydomain.com}}| harbor fully qualified domain name or ip |
 | {{myproject}}| public harbor project where all the container images will be stored |
@@ -94,14 +94,14 @@ Review and replace all values in {{}} and update with your own
 ### 3.2 - create the tanzu kubernetes cluster
 Update all values in {{}} with your registry values
 
-| value | descripton |
+| value | description |
 | ----- | --------- |
-| {{supervisor ip|fqdn}} | vsphere with tanzu supervisor fully qualified domain name or ip |
+| {{supervisor ip-fqdn}} | vsphere with tanzu supervisor fully qualified domain name or ip |
 | {{username}} | supervisor username |
 | {{passwword}} | supervisor password |
 
 ```
-docker run --rm -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tkc
+docker run --rm -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -e SUPERVISOR={{supervisor ip-fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tkc
 ```
 
 ## 4 - validate that kapp controller is available
@@ -140,19 +140,19 @@ Review and replace all values in {{}} and update with your own
 
 Update all values in {{}} with your registry values
 
-| value | descripton |
+| value | description |
 | ----- | --------- |
-| {{supervisor ip|fqdn}} | vsphere with tanzu supervisor fully qualified domain name or ip |
+| {{supervisor ip-fqdn}} | vsphere with tanzu supervisor fully qualified domain name or ip |
 | {{username}} | supervisor username |
 | {{passwword}} | supervisor password |
 
 ```
-docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tanzu-packages
+docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip-fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tanzu-packages
 ```
 
 ## 6 - install configure tanzu mission control self-managed
 ```
-docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tmc-install
+docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip-fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tmc-install
 ```
 
 *please note the tanzu misssion control self managed installation can take several minutes*
