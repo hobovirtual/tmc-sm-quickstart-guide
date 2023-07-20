@@ -15,7 +15,7 @@ Well we got you covered, this quickstart guide will guide you through the instal
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
-- A linux X86_X64 machine with
+- An intel based machine with
     - docker desktop installed
 - A network accessible Harbor Registry
     - you need one public project for Tanzu Mission Control Self Managed images
@@ -56,8 +56,10 @@ mkdir tmc
 tar -xf tmc-self-managed-1.0.0.tar -C ./tmc
 ```
 
-### 2.2 - build local docker image
+### 2.2 - add your harbor certificate
 Update the bootstrap/harbor.crt file with your harbor certificate
+
+### 2.3 - build local docker image
 
 Now let's build our local docker image that will do the work for us
 
@@ -65,7 +67,7 @@ Now let's build our local docker image that will do the work for us
 docker build -t bootstrap bootstrap/.
 ```
 
-### 2.3 - push images to harbor
+### 2.4 - push images to harbor
 Update all values in {{}} with your registry values
 
 | value | description |
