@@ -15,15 +15,12 @@ Well we got you covered, this quickstart guide will guide you through the instal
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
-    - with kapp-controller
-- A linux bootstrap machine with
-    - carvel tools [installed](https://carvel.dev/)
-    - kubectl cli installed
-    - yq [installed](https://github.com/mikefarah/yq/#install)
+- A X86_X64 machine with
     - docker desktop
-    - Tanzu Mission Control - Self Managed installer available from the [Customer Connect download site](https://customerconnect.vmware.com/en/downloads/info/slug/infrastructure_operations_management/vmware_tanzu_mission_control_self_managed/1_0_0)
+    - [ytt](https://carvel.dev/ytt/docs/v0.40.0/install/)
+    - kubectl
 - A network accessible Harbor Registry
-    - you need at least one public project for Tanzu Mission Control Self Managed images
+    - you need one public project for Tanzu Mission Control Self Managed images
     - access to tanzu packages repository - you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
         - if you're working with an internet restricted environment, please [see documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-mgmt-clusters-image-copy-airgapped.html)
 
@@ -53,27 +50,24 @@ git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide.git
 cd tmc-sm-quickstart-guide
 ```
 ## 2 - push images to your harbor registry
-### 2.1. prepare bootstrap machine - for more information you can read the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.0/tanzumc-sm-install/install-tmc-sm.html#download-and-stage-the-installation-images-0)
-```
-mkdir tanzumc
-tar -xf tmc-self-managed-1.0.0.tar -C ./tanzumc
+### 2.1 - download and extract Tanzu Mission Control Self Managed installer in the current directory (from your X86_X64 machine)
+download from the [Customer Connect download site](https://customerconnect.vmware.com/en/downloads/info/slug/infrastructure_operations_management/vmware_tanzu_mission_control_self_managed/1_0_0)
 
-export myharbor={{myharbor.mydomain.com}}
-export myproject={{myproject}}
 ```
-
-You also need to add the root CA certificate of Harbor to the /etc/ssl/certs path of the jumpbox for system-wide use. This enables the image push to the Harbor repository in next step.
-
-### 2.2. push tmc images to harbor
-```
-tanzumc/tmc-sm push-images harbor --project $myharbor/$myproject --username {{username}} --password {{password}}  
+mkdir tmc
+tar -xf tmc-self-managed-1.0.0.tar -C ./tmc
 ```
 
-### 2.3. push images required for dex + openldap to harbor
+### 2.2 - push images to harbor
+Update the bootstrap/harbor.crt file with your harbor certificate
+
+Let's build the docker image that will do the work for us and run it
+
 ```
-imgpkg copy --tar images/busybox.tar --to-repo $myharbor/$myproject/busybox --include-non-distributable-layers
-imgpkg copy --tar images/openldap.tar --to-repo $myharbor/$myproject/openldap --include-non-distributable-layers
-imgpkg copy --tar images/dex.tar --to-repo $myharbor/$myproject/dex --include-non-distributable-layers
+docker build -t bootstrap bootstrap/.
+
+
+docker run --rm -v $PWD/images:/work/images -v $PWD/tmc:/work -e IMGPKG_REGISTRY_HOSTNAME={{myharbor.mydomain.com}} -e PROJECT={{myproject}} -e IMGPKG_REGISTRY_USERNAME={{username}} -e IMGPKG_REGISTRY_PASSWORD={{password}} -it bootstrap
 ```
 
 ## 3 - login to tanzu kubernetes supervisor
@@ -215,13 +209,10 @@ kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": fa
 ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl apply -f -
 ```
 
-## 12 - add the custom cert to your supervisor tkgserviceconfiguration
-In order for your workload clusters to trust your Tanzu Mission Control Self Managed instance, you will need to add the custom certificate in the trusted section of your TkgServiceConfiguration, please see [documentation](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-tanzu/GUID-059EF257-31AF-4DD2-B475-297C5BCB5F49.html) for more information and instructions
-
 ## What's next??
 Tanzu Mission Control Self Managed has now been successfully deployed! Access the interface by following using the credentials below.
 
-tmc.{{mydomain.com}}
+https://tmc.{{mydomain.com}}
 
 user  | password
 ----- |---------
