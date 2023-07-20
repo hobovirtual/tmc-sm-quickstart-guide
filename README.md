@@ -17,8 +17,6 @@ Well we got you covered, this quickstart guide will guide you through the instal
 - vSphere with Tanzu enabled on a vSphere cluster
 - A X86_X64 machine with
     - docker desktop
-    - [ytt](https://carvel.dev/ytt/docs/v0.40.0/install/)
-    - kubectl
 - A network accessible Harbor Registry
     - you need one public project for Tanzu Mission Control Self Managed images
     - access to tanzu packages repository - you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
@@ -58,24 +56,24 @@ mkdir tmc
 tar -xf tmc-self-managed-1.0.0.tar -C ./tmc
 ```
 
-### 2.2 - push images to harbor
+### 2.2 - build local docker image
 Update the bootstrap/harbor.crt file with your harbor certificate
 
-Let's build the docker image that will do the work for us and run it
+Now let's build our local docker image that will do the work for us
 
 ```
 docker build -t bootstrap bootstrap/.
+```
 
-
+### 2.3 - push images to harbor
+Update all values in {{}} with your own
+```
 docker run --rm -v $PWD/images:/work/images -v $PWD/tmc:/work -e IMGPKG_REGISTRY_HOSTNAME={{myharbor.mydomain.com}} -e PROJECT={{myproject}} -e IMGPKG_REGISTRY_USERNAME={{username}} -e IMGPKG_REGISTRY_PASSWORD={{password}} -it bootstrap
 ```
 
-## 3 - login to tanzu kubernetes supervisor
-```
-kubectl vsphere login --server {{supervisor ip|fqdn}} -u {{username}} #(optional) --insecure-skip-tls-verify
-```
+## 3 - create a tanzu kubernetes cluster
 
-## 4 - edit the tkc/tkc-tmc.yaml file with your values
+### 3.1 - edit the tkc/tkc-tmc.yaml file with your values
 Review and replace all values in {{}} and update with your own
 
 | template value | example value |
@@ -83,31 +81,12 @@ Review and replace all values in {{}} and update with your own
 | {{vsphere namespace}} | vns-sanbox |
 | {{storageclass}} | vsan-default-storage-policy |
 
-## 5 - create the tanzu kubernetes cluster
+### 3.2 - create the tanzu kubernetes cluster
 ```
-kubectl apply -f tkc/tkc-tmc.yaml
-
-export clustername=`yq .metadata.name tkc/tkc-tmc.yaml`
-export namespace=`yq .metadata.namespace tkc/tkc-tmc.yaml`
-
-while [[ $(kubectl get cluster $clustername -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}' -n $namespace) != "True" ]]; do
-    echo "waiting for cluster to be ready"
-    sleep 30
-done
+docker run --rm -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tkc
 ```
 
-## 6 - login to tanzu kubernetes cluster
-```
-kubectl vsphere login --server {{supervisor ip|fqdn}} -u {{username}} --tanzu-kubernetes-cluster-namespace $namespace --tanzu-kubernetes-cluster-name $clustername #(optional) --insecure-skip-tls-verify
-```
-
-## 7 - switch context and create cluster role
-```
-kubectl config set-context $clustername
-kubectl apply -f config/clusterrolebinding.yaml
-```
-
-## 8 - validate that kapp controller is available
+## 4 - validate that kapp controller is available
 Recent Tanzu Kubernetes releases should have kapp-controller installed, if you're using an older release, then please install it by following the [official documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-packages-prep-tkgs-kapp.html)
 
 If you want to validate if kapp-controller is present in your tanzu kubernetes cluster
@@ -115,9 +94,11 @@ If you want to validate if kapp-controller is present in your tanzu kubernetes c
 kubectl -n tkg-system get po -l app=kapp-controller
 ```
 
-## 9 - edit configuration files and update them with your values
+## 5 - install and configure tanzu packages
+
+### 5.1 edit configuration files and update them with your values
 Review and replace all values in {{}} and update with your own
-### config/common-values.yaml
+#### config/common-values.yaml
 
 | template value | example value |
 | -------------- | ---------- |
@@ -126,7 +107,7 @@ Review and replace all values in {{}} and update with your own
 | {{mydomain.com}} | tmc.tanzu.lab |
 | {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}} | your harbor certificate |
 
-### packages/standard/secrets.yaml (external-dns)
+#### packages/standard/secrets.yaml (external-dns)
 
 | template value | example value |
 | -------------- | ---------- |
@@ -137,76 +118,15 @@ Review and replace all values in {{}} and update with your own
 
 *NOTE: If you don't want to use external-dns, you can either remove the section from the secrets.yaml and pkgi.yaml files or leave the default*
 
-## 10 - install tanzu packages (cert-manager and external-dns)
+### 5.2 - install tanzu packages (cert-manager and external-dns)
 
 ```
-kubectl apply -f packages/standard/ns.yaml
-kubectl apply -f packages/standard/sa.yaml
-ytt -f config/common-values.yaml -f packages/standard/secrets.yaml | kubectl apply -f -
-
-# kapp-controller (trust harbor)
-kubectl -n tkg-system delete po -l app=kapp-controller
-
-# package repository
-ytt -f config/common-values.yaml -f packages/standard/pkgr.yaml | kubectl apply -f -
-
-export name=`yq .metadata.name packages/standard/pkgr.yaml`
-export namespace=`yq .metadata.namespace packages/standard/pkgr.yaml`
-
-while [[ $(kubectl -n $namespace get pkgr $name -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for repository $name to be ready"
-    sleep 10
-done
-
-# package install
-ytt -f config/common-values.yaml -f packages/standard/pkgi.yaml | kubectl apply -f -
-
-while [[ $(kubectl -n $namespace get pkgi cert-manager -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for cert-manager to be ready"
-    sleep 10
-done
-
-while [[ $(kubectl -n $namespace get pkgi external-dns -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for external-dns to be ready"
-    sleep 10
-done
+docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tanzu-packages
 ```
 
-## 11 - configure tanzu mission control self-managed
+## 6 - install configure tanzu mission control self-managed
 ```
-kubectl apply -f packages/tmc/ns.yaml
-kubectl apply -f packages/tmc/sa.yaml
-
-# certificate cluster issuer
-ytt -f config/common-values.yaml -f config/localissuer.yaml | kubectl apply -f -
-
-# package repository
-ytt -f config/common-values.yaml -f packages/tmc/pkgr.yaml | kubectl apply -f -
-
-export name=`yq .metadata.name packages/tmc/pkgr.yaml`
-export namespace=`yq .metadata.namespace packages/tmc/pkgr.yaml`
-
-while [[ $(kubectl -n $namespace get pkgr $name -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for repository $name to be ready"
-    sleep 10
-done
-
-# package install
-ytt -f config/common-values.yaml -f packages/tmc/secrets.yaml -f packages/tmc/pkgi.yaml | kubectl apply -f -
-
-while [[ $(kubectl -n $namespace get pkgi contour -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
-    echo "waiting for contour to be ready"
-    sleep 10
-done
-
-# install dex (OIDC)
-ytt -f config/common-values.yaml -f packages/dex/deployment.yaml| kubectl apply -f -
-kubectl annotate packageinstalls tmc -n tmc-local ext.packaging.carvel.dev/ytt-paths-from-secret-name.2=tmc-overlay-override-dex
-kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": true}}'
-kubectl patch -n tmc-local --type merge pkgi tmc --patch '{"spec": {"paused": false}}'
- 
-# openldap
-ytt -f config/common-values.yaml -f packages/openldap/deployment.yaml | kubectl apply -f -
+docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PWD/tkc:/work/tkc -v $PWD/packages:/work/packages -e SUPERVISOR={{supervisor ip|fqdn}} -e USERNAME={{username}} -e KUBECTL_VSPHERE_PASSWORD={{password}} -it bootstrap tmc-install
 ```
 
 ## What's next??
