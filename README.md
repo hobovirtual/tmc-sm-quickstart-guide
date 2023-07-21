@@ -31,6 +31,8 @@ Well we got you covered, this quickstart guide will guide you through the instal
 - dex (OIDC provider)
 - opendlap (for user authentication)
 
+![Tanzu Mission Control Self Managed](pictures/tmc-sm.jpg)
+
 "*" *If you don't want to use dynamic dns configuration you can create two dns entries manually*
 - tmc.mydomain.com 
 - *.tmc.mydomain.com
