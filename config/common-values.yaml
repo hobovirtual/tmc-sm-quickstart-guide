@@ -5,7 +5,7 @@ registry:
     repo: {{myharbor.mydomain.com}}/{{myproject}}
     version: 1.0.0
   standard:
-    repo: {{myharbor.mydomain.com}}/{{myproject}}
+    repo: projects.registry.vmware.com/tkg/packages/standard/repo
     version: v2.2.0
   openldap:
     repo: {{myharbor.mydomain.com}}/{{myproject}}
