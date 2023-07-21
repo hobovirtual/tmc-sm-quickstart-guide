@@ -37,7 +37,7 @@ Well, we got you covered, this QuickStart guide will guide you through the insta
 - tmc.mydomain.com 
 - *.tmc.mydomain.com
 
-DNS entries will point to the contour-envoy load balancer IP once deployed in step 11 - you can easily retrieve the IP using this command
+DNS entries will point to the contour-envoy load balancer IP once deployed in step 6 - you can easily retrieve the IP using this command
 ```
 kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.ingress[0].ip'}
 ```
