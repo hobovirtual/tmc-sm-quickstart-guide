@@ -30,7 +30,7 @@ spec:
   - #@ "dex.{}".format(data.values.domain)
   issuerRef:
     kind: ClusterIssuer
-    name: local-issuer
+    name: #@ data.values.certmanager.clusterissuer
   secretName: dex-tls
 ---
 apiVersion: projectcontour.io/v1
