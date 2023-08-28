@@ -14,9 +14,7 @@ then
     /work/scripts/kubectl-vsphere login --server $SUPERVISOR -u $USERNAME --insecure-skip-tls-verify
     kubectl apply -f /work/tkc/tkc-tmc.yaml
     
-    kubectl get cluster $clustername -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}' -n $namespace
-
-    while [[ $(kubectl get cluster $clustername -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}' -n $namespace) != "True" ]]; do
+    while [[ $(kubectl get tkc $clustername -o=jsonpath='{.status.conditions[?(@.type=="Ready")].status}' -n $namespace) != "True" ]]; do
         echo "waiting for cluster to be ready"
         sleep 30
     done
