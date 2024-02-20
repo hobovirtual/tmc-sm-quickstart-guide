@@ -61,20 +61,29 @@ cd tmc-sm-quickstart-guide
 Review and replace all values in {{}} and update with your own
 #### config/common-values.yaml
 
-| template value | example value |
-| -------------- | ---------- |
-| {{clustername}} | tkc-sm-00 |
-| {{vsphere-namespace}} | vns-sandbox |
-| {{tkr-version}} | v1.26.5---vmware.2-fips.1-tkg.1 |
-| {{storageclass}} | vsan-default-storage-policy |
-| {{myharbor.mydomain.com}} | harbor.Tanzu.lab |
-| {{myproject}} | tmc |
-| {{mydomain.com}} | tmc.Tanzu.lab |
-| {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}} | your harbor certificate |
-| {{owner id}} | tmc.tanzu.lab |
-| {{dns1, dns2}} | 192.168.2.1,192.168.1.1 |
-| {{dns zone}} | tanzu.lab |
-| {{domain filter}} | tanzu.lab |
+| component | template value | example value |
+| --------- | -------------- | ---------- |
+| tkg | {{clustername}} | tkc-sm-00 |
+| tkg | {{vsphere-namespace}} | vns-sandbox |
+| tkg | {{tkr-version}} | v1.26.5---vmware.2-fips.1-tkg.1 |
+| tkg | {{storageclass}} | vsan-default-storage-policy |
+| tmc | {{mydomain.com}} | tmc.Tanzu.lab |
+| external-dns | {{owner id}} | tmc.tanzu.lab |
+| external-dns | {{dns1, dns2}} | 192.168.2.1,192.168.1.1 |
+| external-dns | {{dns zone}} | tanzu.lab |
+| external-dns | {{domain filter}} | tanzu.lab |
+| tmc active directory | {{domain admin group}} | tmc-administrators |
+| tmc active directory | {{domain name}} | tanzu.lab |
+| tmc active directory | {{groupbase search dn}}" | OU=groups,OU=platform,DC=tanzu,DC=lab |
+| tmc active directory | {{domain controller|name}} | tanzu.lab |
+| tmc active directory | {{domain users group}} | tmc-users |
+| tmc active directory | {{username password}} | VMware1! |
+| tmc active directory | {{userbase search dn}} | OU=users,OU=platform,DC=tanzu,DC=lab |
+| tmc active directory | {{username dn}} | CN=svc-ldap,OU=service-accounts,OU=users,OU=platform,DC=tanzu,DC=lab |
+| tmc active directory | rootCA | Active Directory Certificate |
+| registry | {{myharbor.mydomain.com}} | harbor.Tanzu.lab |
+| registry | {{myproject}} | tmc |
+| registry | {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}} | your harbor certificate |
 
 *NOTE: If you don't want to use external-dns, you can either remove the section from the secrets.yaml and pkgi.yaml files or leave the default*
 
