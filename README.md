@@ -106,7 +106,7 @@ export SUPERVISOR_PASSWORD=supervisorpassword
 
 ## 3 - push images to your harbor registry
 ### 3.1 - download and extract Tanzu Mission Control Self-Managed installer in the current directory (from your X86_X64 machine)
-download from the [Customer Connect download site](https://customerconnect.vmware.com/en/downloads/info/slug/infrastructure_operations_management/vmware_Tanzu_mission_control_self_managed/1_0_0)
+download from the [Customer Connect download site](https://customerconnect.vmware.com/en/downloads/info/slug/infrastructure_operations_management/vmware_tanzu_mission_control_self_managed/1_1_0)
 
 ```
 mkdir tmc
