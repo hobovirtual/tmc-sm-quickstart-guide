@@ -1,35 +1,44 @@
 #@data/values
 ---
-registry:
-  tmc:
-    repo: {{myharbor.mydomain.com}}/{{myproject}}
-    version: 1.0.0
-  standard:
-    repo: projects.registry.vmware.com/tkg/packages/standard/repo
-    version: v2.2.0
-  openldap:
-    repo: {{myharbor.mydomain.com}}/{{myproject}}
-    version: 1.2.4
-  busybox:
-    repo: {{myharbor.mydomain.com}}/{{myproject}}
-    version: latest
-  dex:
-    repo: {{myharbor.mydomain.com}}/{{myproject}}
-    version: 2.35.3
+cluster:
+  name: {{clustername}}
+  namespace: {{vsphere-namespace}}
+  version: {{tkr-version}}
+  storageclass: {{storageclass}}
 
 certmanager:
-  version: 1.10.2+vmware.1-tkg.1
+  version: 1.12.2+vmware.1-tkg.1
   clusterissuer: local-issuer
 
 domain: {{mydomain.com}}
 
 externaldns:
-  version: 0.12.2+vmware.5-tkg.1
+  version: 0.13.4+vmware.2-tkg.3
+  ownerid: {{owner id}} 
+  servers: {{dns1, dns2}}
+  zone: {{dns zone}}
 
-oidc:
-  issuerType: pinniped
-  clientid: tmc-auth
-  clientsecret: secretvalue
+ldap:
+  admin: {{DOMAIN ADMIN GROUP}}
+  domainName: {{DOMAIN NAME}}
+  groupBaseDN: "{{GROUPSBASE SEARCH DN}}" 
+  host: "{{DOMAIN CONTROLLER|NAME}}"
+  member: {{DOMAIN USERS GROUP}}
+  password: "{{USERAME PASSWORD}}"
+  type: activedirectory
+  userBaseDN: "{{USERBASE SEARCH DN}}"
+  username: "{{USERNAME DN}}"
+  rootCA: |
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----
+
+registry:
+  tmc:
+    repo: {{myharbor.mydomain.com}}/{{myproject}}
+    version: 1.1.0
+  standard:
+    repo: {{myharbor.mydomain.com}}/tkg/packages/standard/repo
+    version: v2023.11.21
 
 trusted:
   ca: |-
@@ -68,4 +77,5 @@ trusted:
     8xZt/oYOG+RuUx8=
     -----END CERTIFICATE-----
   harbor: |-
-   {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}}
+    -----BEGIN CERTIFICATE-----
+    -----END CERTIFICATE-----

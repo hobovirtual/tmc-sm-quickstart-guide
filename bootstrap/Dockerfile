@@ -1,4 +1,6 @@
 FROM ubuntu
+ENV http_proxy http://10.0.10.5:3128
+ENV https_proxy http://10.0.10.5:3128
 WORKDIR /work
 COPY harbor.crt /etc/ssl/certs/
 
