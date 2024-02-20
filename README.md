@@ -86,7 +86,7 @@ Review and replace all values in {{}} and update with your own
 | active directory | rootCA | Active Directory Certificate |
 | registry | {{myharbor.mydomain.com}} | harbor.tanzu.lab |
 | registry | {{myproject}} | tmc |
-| registry | {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}} | your harbor certificate |
+| trusted certificate | harbor | your harbor certificate |
 
 *NOTE: If you don't want to use external-dns, you can either remove the section from the secrets.yaml and pkgi.yaml files or leave the default*
 
