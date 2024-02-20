@@ -15,6 +15,7 @@ Well, we got you covered, this QuickStart guide will guide you through the insta
 
 ## Prerequisite
 - vSphere with Tanzu enabled on a vSphere cluster
+- Active Directory
 - An Intel based operating system with
     - docker desktop installed
 - A network accessible Harbor Registry
@@ -24,7 +25,6 @@ Well, we got you covered, this QuickStart guide will guide you through the insta
 ```
 imgpkg copy -b projects.registry.vmware.com/tkg/packages/standard/repo:v2023.11.21 --to-repo $HARBOR_HOSTNAME/tkg/packages/standard/repo
 ```
-- An Active Directory
 
 ## In this guide we will deploy the following components
 - Tanzu kubernetes cluster 1.2+
