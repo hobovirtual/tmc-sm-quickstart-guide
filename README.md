@@ -144,21 +144,25 @@ docker run --rm -v $PWD/config:/work/config -v $PWD/scripts:/work/scripts -v $PW
 ```
 
 *please note the Tanzu misssion control self-managed installation can take several minutes*
-## What's next??
+# What's next??
 Tanzu Mission Control Self-Managed has now been successfully deployed! Access the interface by following using the active directory credentials via the url below.
 
 https://tmc.{{mydomain.com}}
 
+## Complete the Registration of a Supervisor Cluster in vSphere with Tanzu
 To ensure new Tanzu Kubernetes Grid clusters can be managed by Tanzu Mission Control, you will need to add an agentconfig as describe [here](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.1/tanzumc-using/GUID-CC6E721E-43BF-4066-AA0A-F744280D6A03.html#GUID-CC6E721E-43BF-4066-AA0A-F744280D6A03). 
 
-Please validate the tmc namespace for your supervisor installation and update the packages/tmc/agentconfig.yaml (using the most common namespace, ie: svc-tmc-c8), once completed, you can apply the agent config via this command before registering you supervisor cluster
+Retrieve the tmc namespace for your supervisor installation 
+
+```
+export TMCNS=`kubectl get ns | grep svc-tm | cut -d" " -f1` 
+```
 
 ```
 kubectl vsphere login --insecure-skip-tls-verify --server $SUPERVISOR -u $SUPERVISOR_USERNAME
 kubectl config set-context $SUPERVISOR
-ytt -f config/common-values.yaml -f packages/tmc/agentconfig.yaml | kubectl apply -f -
+ytt -f config/common-values.yaml -f packages/tmc/agentconfig.yaml | kubectl apply -n $TMCNS -f -
 ```
 
-If you want to add your supervisor cluster as a management cluster follow this [doc](https://docs.vmware.com/en/VMware-vSphere/7.0/vmware-vsphere-with-Tanzu/GUID-ED4417DC-592C-454A-8292-97F93BD76957.html)
-
-If you want to attach a cluster, see this [doc](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/services/Tanzumc-using/GUID-6DF2CE3E-DD07-499B-BC5E-6B3B2E02A070.html)
+## Copying Tanzu Standard and Inspection Images
+Copy the Tanzu Standard package and the third-party Sonobouy inspection scan images to your private image registry by following this [procedure](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.1/tanzumc-sm-install/tanzu-conf-images.html)

@@ -1,0 +1,11 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:base64", "base64")
+---
+apiVersion: installers.tmc.cloud.vmware.com/v1alpha1
+kind: AgentConfig
+metadata:
+  name: tmc-agent-config
+spec:
+  caCerts: #@ "{}".format(data.values.trusted.ca)
+  allowedHostNames:
+    - #@ "{}".format(data.values.domain)
