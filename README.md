@@ -110,7 +110,7 @@ download from the [Customer Connect download site](https://customerconnect.vmwar
 
 ```
 mkdir tmc
-tar -xf tmc-self-managed-1.0.0.tar -C ./tmc
+tar -xf tmc-self-managed-1.1.0.tar -C ./tmc
 ```
 
 ### 3.2 - add your harbor certificate
