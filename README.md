@@ -72,15 +72,15 @@ Review and replace all values in {{}} and update with your own
 | external-dns | {{dns1, dns2}} | 192.168.2.1,192.168.1.1 |
 | external-dns | {{dns zone}} | tanzu.lab |
 | external-dns | {{domain filter}} | tanzu.lab |
-| tmc active directory | {{domain admin group}} | tmc-administrators |
-| tmc active directory | {{domain name}} | tanzu.lab |
-| tmc active directory | {{groupbase search dn}}" | OU=groups,OU=platform,DC=tanzu,DC=lab |
-| tmc active directory | {{domain controller|name}} | tanzu.lab |
-| tmc active directory | {{domain users group}} | tmc-users |
-| tmc active directory | {{username password}} | VMware1! |
-| tmc active directory | {{userbase search dn}} | OU=users,OU=platform,DC=tanzu,DC=lab |
-| tmc active directory | {{username dn}} | CN=svc-ldap,OU=service-accounts,OU=users,OU=platform,DC=tanzu,DC=lab |
-| tmc active directory | rootCA | Active Directory Certificate |
+| active directory | {{domain admin group}} | tmc-administrators |
+| active directory | {{domain name}} | tanzu.lab |
+| active directory | {{groupbase search dn}}" | OU=groups,OU=platform,DC=tanzu,DC=lab |
+| active directory | {{domain controller|name}} | tanzu.lab |
+| active directory | {{domain users group}} | tmc-users |
+| active directory | {{username password}} | VMware1! |
+| active directory | {{userbase search dn}} | OU=users,OU=platform,DC=tanzu,DC=lab |
+| active directory | {{username dn}} | CN=svc-ldap,OU=service-accounts,OU=users,OU=platform,DC=tanzu,DC=lab |
+| active directory | rootCA | Active Directory Certificate |
 | registry | {{myharbor.mydomain.com}} | harbor.Tanzu.lab |
 | registry | {{myproject}} | tmc |
 | registry | {{ -----BEGIN CERTIFICATE----- -----END CERTIFICATE-----}} | your harbor certificate |
