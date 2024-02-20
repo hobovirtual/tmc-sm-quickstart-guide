@@ -20,7 +20,10 @@ Well, we got you covered, this QuickStart guide will guide you through the insta
 - A network accessible Harbor Registry
     - you need one public project for Tanzu Mission Control Self-Managed images
     - access to Tanzu packages repository - you can use the public repo projects.registry.vmware.com/tkg/packages/standard/repo
-        - if you're working with an internet restricted environment, please [see documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-Tanzu-kubernetes-grid-16/GUID-mgmt-clusters-image-copy-airgapped.html)
+        - if you're working with an internet restricted environment you can copy the pacakges with this command
+```
+imgpkg copy -b projects.registry.vmware.com/tkg/packages/standard/repo:v2023.11.21 --to-repo $HARBOR_HOSTNAME/tkg/packages/standard/repo
+```
 - An Active Directory
 
 ## In this guide we will deploy the following components
