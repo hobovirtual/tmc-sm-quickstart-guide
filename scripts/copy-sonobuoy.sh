@@ -2,7 +2,7 @@
 
 VERSION=${1:-"v0.56.16"}
 LATEST_RELEASE=${2:-"sonobuoy_0.56.16_linux_amd64.tar.gz"}
-CUSTOM_REGISTRY=${3:-"harbor-00.platform.lab"}
+CUSTOM_REGISTRY=${3:-"myharbor.mydomain.com"}
 DOCKER_PROXY=${4:-"harbor.tanzu.io:8443/dockerhub-proxy-cache"} # optional argument
 CUSTOM_TMC_REPO="${CUSTOM_REGISTRY}/tmc-install/498533941640.dkr.ecr.us-west-2.amazonaws.com"
 
