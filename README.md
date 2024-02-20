@@ -150,7 +150,7 @@ Tanzu Mission Control Self-Managed has now been successfully deployed! Access th
 https://tmc.{{mydomain.com}}
 
 ## Complete the Registration of a Supervisor Cluster in vSphere with Tanzu
-To ensure new Tanzu Kubernetes Grid clusters can be managed by Tanzu Mission Control, you will need to add an agentconfig as describe [here](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.1/tanzumc-using/GUID-CC6E721E-43BF-4066-AA0A-F744280D6A03.html#GUID-CC6E721E-43BF-4066-AA0A-F744280D6A03). 
+To ensure new Tanzu Kubernetes Grid clusters can be managed by Tanzu Mission Control, you will need to add an AgentConfig as describe [here](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.1/tanzumc-using/GUID-CC6E721E-43BF-4066-AA0A-F744280D6A03.html#GUID-CC6E721E-43BF-4066-AA0A-F744280D6A03). 
 
 Retrieve the tmc namespace for your supervisor installation 
 
@@ -158,11 +158,15 @@ Retrieve the tmc namespace for your supervisor installation
 export TMCNS=`kubectl get ns | grep svc-tm | cut -d" " -f1` 
 ```
 
+Apply the AgentConfig to your Supervisor Cluster
+
 ```
 kubectl vsphere login --insecure-skip-tls-verify --server $SUPERVISOR -u $SUPERVISOR_USERNAME
 kubectl config set-context $SUPERVISOR
 ytt -f config/common-values.yaml -f packages/tmc/agentconfig.yaml | kubectl apply -n $TMCNS -f -
 ```
+
+You can now proceed with the management cluster registration as described [here](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.1/tanzumc-using/GUID-EB507AAF-5F4F-400F-9623-BA611233E0BD.html#procedure-2)
 
 ## Copying Tanzu Standard and Inspection Images
 Copy the Tanzu Standard package and the third-party Sonobouy inspection scan images to your private image registry by following this [procedure](https://docs.vmware.com/en/VMware-Tanzu-Mission-Control/1.1/tanzumc-sm-install/tanzu-conf-images.html)
