@@ -55,7 +55,7 @@ kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.in
 
 ## 1 - clone this repo
 ```
-git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide.git
+git clone https://github.com/hobovirtual/tmc-sm-quickstart-guide --branch=1.1
 cd tmc-sm-quickstart-guide
 ```
 
