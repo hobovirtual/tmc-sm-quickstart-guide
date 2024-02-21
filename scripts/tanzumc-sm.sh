@@ -91,6 +91,7 @@ then
     echo "----------------------------------------------------"
     echo -n "contour-envoy load balancer IP: " 
     kubectl -n tmc-local get svc contour-envoy -o jsonpath={'.status.loadBalancer.ingress[0].ip'}
+    echo ""
     echo "----------------------------------------------------"
 
     while [[ $(kubectl -n $namespace get pkgi tmc -o=jsonpath='{.status.conditions[?(@.type=="ReconcileSucceeded")].status}') != "True" ]]; do
