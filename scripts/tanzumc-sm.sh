@@ -12,7 +12,9 @@ then
     ytt -f /work/config/common-values.yaml -f /work/tkc/secrets.yaml | kubectl apply -f -
     ytt -f /work/config/common-values.yaml -f /work/tkc/tkc-tmc.yaml | kubectl apply -f -
     
-    while [[ $(kubectl get cluster $clustername -o=jsonpath='{.status.conditions[?(@.type=="ControlPlaneReady")].status}' -n $namespace) != "True" ]]; do
+    sleep 30
+    
+    while [[ $(kubectl get machinesets.cluster.x-k8s.io -l cluster.x-k8s.io/cluster-name=$clustername -o=jsonpath='{.items[].status.conditions[?(@.type=="Ready")].status}' -n $namespace) != "True" ]]; do
         echo "waiting for cluster to be ready"
         sleep 30
     done
